@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Notificações persistidas do jogador no Lago Paranoá">
+  <title>Notificações · Lago Paranoá</title>
+  <style>
+    :root { --ink:#183b36; --muted:#667d77; --line:#d7e7e2; --canvas:#f2f8f6; --surface:#fff; --teal:#08766a; --deep:#07554d; --mint:#e2f4ee; --warning:#a86610; --danger:#aa3f39; --shadow:0 18px 45px rgba(18,67,59,.1); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 90% -5%,#d9eee8 0,transparent 30rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    button { font:inherit; cursor:pointer; }
+    a { color:inherit; }
+    .page { width:min(960px,calc(100% - 28px)); margin:0 auto; padding:28px 0 50px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:20px; }
+    .back { color:var(--deep); font-size:12px; font-weight:800; text-decoration:none; }
+    .btn { border:1px solid var(--line); border-radius:11px; padding:10px 14px; color:var(--ink); background:#fff; font-weight:800; }
+    .btn:hover,.btn:focus-visible { border-color:#72a99d; outline:none; }
+    .btn-primary { border-color:var(--teal); color:#fff; background:var(--teal); }
+    .hero { padding:clamp(26px,5vw,45px); border-radius:23px; color:#effaf7; background:linear-gradient(120deg,#0a5c53,#138779); box-shadow:var(--shadow); }
+    .eyebrow { margin:0 0 9px; color:#afe1d4; text-transform:uppercase; letter-spacing:.14em; font-size:10px; font-weight:900; }
+    h1 { margin:0 0 10px; font-size:clamp(31px,5vw,50px); letter-spacing:-.045em; }
+    .hero p:last-child { max-width:650px; margin:0; color:#d7efe8; font-size:13px; line-height:1.65; }
+    .controls { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin:18px 0; }
+    .filters,.actions { display:flex; flex-wrap:wrap; gap:8px; }
+    .filter.active { border-color:var(--teal); color:#fff; background:var(--teal); }
+    .count { display:inline-grid; min-width:20px; height:20px; margin-left:5px; place-items:center; border-radius:99px; color:var(--deep); background:var(--mint); font-size:10px; }
+    .filter.active .count { color:var(--deep); background:#d7f1e9; }
+    .list { display:grid; gap:10px; padding:0; margin:0; list-style:none; }
+    .notification { display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:13px; align-items:start; padding:18px; border:1px solid var(--line); border-radius:16px; background:var(--surface); box-shadow:0 7px 25px rgba(18,67,59,.045); }
+    .notification.unread { border-left:5px solid var(--teal); }
+    .icon { display:grid; width:44px; height:44px; place-items:center; border-radius:12px; color:var(--deep); background:var(--mint); font-weight:900; }
+    .meta { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .meta strong { font-size:13px; }
+    .tag { padding:4px 7px; border-radius:99px; color:var(--deep); background:var(--mint); font-size:9px; font-weight:900; text-transform:uppercase; }
+    .tag.critical { color:var(--danger); background:#fde8e6; }
+    .tag.warning { color:var(--warning); background:#fff1d9; }
+    .message { margin:7px 0 0; color:var(--muted); font-size:12px; line-height:1.6; }
+    time { display:block; margin-top:8px; color:#82958f; font-size:10px; }
+    .read-button { align-self:center; border:0; padding:9px 11px; border-radius:10px; color:var(--deep); background:var(--mint); font-size:10px; font-weight:850; }
+    .read-button:disabled { cursor:default; color:var(--muted); background:#edf2f0; }
+    .status,.empty { padding:28px; border:1px dashed #b9d1ca; border-radius:15px; color:var(--muted); text-align:center; font-size:12px; }
+    .status { min-height:18px; padding:9px; border:0; color:var(--deep); font-weight:750; }
+    .status.error { color:var(--danger); }
+    .loading { opacity:.6; pointer-events:none; }
+    @media(max-width:650px){ .page{width:min(100% - 20px,960px);padding-top:15px}.topbar,.controls{align-items:stretch;flex-direction:column}.notification{grid-template-columns:40px minmax(0,1fr)}.read-button{grid-column:2;justify-self:start} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="notificationsApp">
+    <div class="topbar">
+      <a class="back" href="?page=dashboard">← Voltar ao painel</a>
+      <button class="btn" id="refreshButton" type="button">↻ Atualizar</button>
+    </div>
+    <header class="hero">
+      <p class="eyebrow">Memória da investigação</p>
+      <h1>Notificações persistidas.</h1>
+      <p>Retome alertas e resultados associados ao seu jogador. Marcar uma mensagem como lida atualiza apenas o seu próprio registro.</p>
+    </header>
+    <section class="controls" aria-label="Controles de notificação">
+      <div class="filters">
+        <button class="btn filter active" type="button" data-filter="all">Todas <span class="count" id="allCount">0</span></button>
+        <button class="btn filter" type="button" data-filter="unread">Não lidas <span class="count" id="unreadCount">0</span></button>
+      </div>
+      <div class="actions"><button class="btn btn-primary" id="markAllButton" type="button">Marcar todas como lidas</button></div>
+    </section>
+    <div class="status" id="pageStatus" role="status" aria-live="polite"></div>
+    <ul class="list" id="notificationList"><li class="empty">Carregando notificações…</li></ul>
+  </main>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      const app=document.getElementById('notificationsApp');
+      const list=document.getElementById('notificationList');
+      const status=document.getElementById('pageStatus');
+      let notifications=[];
+      let activeFilter='all';
+
+      function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(char){return({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[char]})}
+      function typeLabel(type){return({CRITICAL:'Crítica',WARNING:'Atenção',SUCCESS:'Resultado',NARRATIVE:'Narrativa',INFO:'Informação'})[String(type||'INFO').toUpperCase()]||'Informação'}
+      function icon(type){return({CRITICAL:'!',WARNING:'△',SUCCESS:'✓',NARRATIVE:'◉',INFO:'i'})[String(type||'INFO').toUpperCase()]||'i'}
+      function dateLabel(value){if(!value)return'Data não informada';const date=new Date(value);return Number.isNaN(date.getTime())?'Data não informada':date.toLocaleString('pt-BR')}
+      function setStatus(message,error){status.textContent=message||'';status.className='status'+(error?' error':'')}
+      function filtered(){return activeFilter==='unread'?notifications.filter(function(item){return!item.read}):notifications}
+      function render(){
+        document.getElementById('allCount').textContent=notifications.length;
+        document.getElementById('unreadCount').textContent=notifications.filter(function(item){return!item.read}).length;
+        document.getElementById('markAllButton').disabled=!notifications.some(function(item){return!item.read});
+        const rows=filtered();
+        list.innerHTML=rows.length?rows.map(function(item){
+          const type=String(item.type||'INFO').toLowerCase();
+          return '<li class="notification'+(item.read?'':' unread')+'"><span class="icon">'+escapeHtml(icon(item.type))+'</span><div><div class="meta"><strong>'+escapeHtml(item.title||'Atualização do jogo')+'</strong><span class="tag '+escapeHtml(type)+'">'+escapeHtml(typeLabel(item.type))+'</span></div><p class="message">'+escapeHtml(item.message)+'</p><time datetime="'+escapeHtml(item.createdAt||'')+'">'+escapeHtml(dateLabel(item.createdAt))+'</time></div><button class="read-button" type="button" data-id="'+escapeHtml(item.notificationId)+'"'+(item.read?' disabled':'')+'>'+(item.read?'Lida':'Marcar como lida')+'</button></li>'
+        }).join(''):'<li class="empty">'+(activeFilter==='unread'?'Nenhuma notificação não lida.':'Ainda não há notificações para este jogador.')+'</li>';
+      }
+      async function load(announce){app.classList.add('loading');setStatus('',false);try{const result=await API.notifications.list(30);const data=API.unwrap(result);notifications=Array.isArray(data.notifications)?data.notifications:[];render();if(announce)setStatus('Notificações atualizadas.',false)}catch(error){list.innerHTML='<li class="empty">Não foi possível carregar as notificações.</li>';setStatus(error.message||'Falha ao carregar notificações.',true)}finally{app.classList.remove('loading')}}
+      async function markRead(id){app.classList.add('loading');try{API.unwrap(await API.notifications.markRead(id));const item=notifications.find(function(row){return String(row.notificationId)===String(id)});if(item)item.read=true;render();setStatus('Notificação marcada como lida.',false)}catch(error){setStatus(error.message||'Não foi possível atualizar a notificação.',true)}finally{app.classList.remove('loading')}}
+      async function markAll(){app.classList.add('loading');try{API.unwrap(await API.notifications.markAllRead());notifications.forEach(function(item){item.read=true});render();setStatus('Todas as notificações foram marcadas como lidas.',false)}catch(error){setStatus(error.message||'Não foi possível atualizar as notificações.',true)}finally{app.classList.remove('loading')}}
+
+      document.querySelectorAll('[data-filter]').forEach(function(button){button.addEventListener('click',function(){activeFilter=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(function(item){item.classList.toggle('active',item===button)});render()})});
+      list.addEventListener('click',function(event){const button=event.target.closest('[data-id]');if(button&&!button.disabled)markRead(button.dataset.id)});
+      document.getElementById('refreshButton').addEventListener('click',function(){load(true)});
+      document.getElementById('markAllButton').addEventListener('click',markAll);
+      load(false);
+    })();
+  </script>
+</body>
+</html>

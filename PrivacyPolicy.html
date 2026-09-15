@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aviso de privacidade do jogo educacional Lago Paranoá">
+  <title>Privacidade · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#627a74; --line:#d7e7e2; --canvas:#f3f8f6; --surface:#fff; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c98c2f; --shadow:0 18px 48px rgba(18,67,59,.1); }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:radial-gradient(circle at 88% -5%,#d9eee8 0,transparent 31rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; } a { color:var(--deep); }
+    .page { min-height:100vh; padding:25px clamp(16px,4vw,52px) 50px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:15px; max-width:1040px; margin:0 auto 28px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:850; } .mark { width:39px; height:39px; display:grid; place-items:center; border-radius:12px; color:#fff; background:var(--teal); }
+    .back { padding:10px 14px; border:1px solid var(--line); border-radius:10px; color:var(--ink); background:rgba(255,255,255,.8); text-decoration:none; font-size:12px; font-weight:800; }
+    .content { max-width:1040px; margin:0 auto; }
+    .hero { padding:clamp(28px,5vw,52px); border-radius:23px; color:#effaf6; background:linear-gradient(120deg,#0a5c53,#138678); box-shadow:var(--shadow); }
+    .eyebrow { margin:0 0 10px; color:#afe0d3; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; } h1 { margin:0 0 14px; font-size:clamp(34px,5vw,58px); line-height:1.02; letter-spacing:-.045em; } .hero p:last-child { max-width:720px; margin:0; color:#d9f0e9; font-size:14px; line-height:1.7; }
+    .summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0; }
+    .summary article { padding:17px; border:1px solid var(--line); border-radius:15px; background:rgba(255,255,255,.85); } .summary strong { display:block; margin-bottom:5px; font-size:12px; } .summary p { margin:0; color:var(--muted); font-size:11px; line-height:1.5; }
+    .document { display:grid; grid-template-columns:220px minmax(0,1fr); gap:22px; align-items:start; }
+    .toc,.policy { border:1px solid var(--line); border-radius:18px; background:var(--surface); box-shadow:0 8px 28px rgba(18,67,59,.05); }
+    .toc { position:sticky; top:20px; padding:18px; } .toc strong { display:block; margin-bottom:9px; font-size:12px; } .toc ol { display:grid; gap:7px; margin:0; padding-left:20px; color:var(--muted); font-size:11px; } .toc a { text-decoration:none; }
+    .policy { padding:clamp(22px,4vw,38px); } .policy section+section { margin-top:29px; padding-top:27px; border-top:1px solid #e7efec; } h2 { margin:0 0 10px; font-size:20px; letter-spacing:-.025em; } .policy p,.policy li { color:#526b65; font-size:13px; line-height:1.72; } .policy ul { padding-left:20px; }
+    .notice { margin-top:13px; padding:14px; border-left:4px solid var(--gold); border-radius:0 12px 12px 0; color:#705727; background:#fff8e8; font-size:12px; line-height:1.6; }
+    footer { margin-top:20px; color:var(--muted); text-align:center; font-size:11px; }
+    @media(max-width:760px){ .summary{grid-template-columns:1fr}.document{grid-template-columns:1fr}.toc{position:static}.topbar{align-items:stretch;flex-direction:column}.back{text-align:center} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar"><div class="brand"><span class="mark">◒</span><span>Paranoá vivo</span></div><a class="back" href="?page=index">← Voltar ao início</a></div>
+    <div class="content">
+      <header class="hero"><p class="eyebrow">Aviso de privacidade e uso responsável</p><h1>Dados mínimos para uma experiência educacional.</h1><p>Este documento explica o que o jogo registra, por que registra e quais cuidados devem orientar o uso em contexto escolar.</p></header>
+      <section class="summary" aria-label="Resumo do tratamento de dados"><article><strong>Finalidade definida</strong><p>Autenticar participantes, manter o estado do jogo e apoiar a mediação pedagógica.</p></article><article><strong>Sem publicidade</strong><p>Os dados do projeto não são usados para anúncios ou venda de perfis.</p></article><article><strong>Mediação adulta</strong><p>Atividades com estudantes devem ocorrer sob responsabilidade da escola e de um educador.</p></article></section>
+      <div class="document">
+        <nav class="toc" aria-label="Neste aviso"><strong>Neste aviso</strong><ol><li><a href="#escopo">Escopo</a></li><li><a href="#dados">Dados registrados</a></li><li><a href="#finalidades">Finalidades</a></li><li><a href="#cuidados">Cuidados escolares</a></li><li><a href="#retencao">Retenção e acesso</a></li><li><a href="#direitos">Solicitações</a></li></ol></nav>
+        <article class="policy">
+          <section id="escopo"><h2>1. Escopo</h2><p>O Lago Paranoá é uma simulação educacional sobre recursos hídricos e decisões coletivas. O ambiente é mantido em Google Apps Script e Planilhas Google configuradas pela instituição responsável.</p><div class="notice">A implantação local da escola deve definir responsáveis, contas de teste, prazo de retenção e procedimento de atendimento antes de envolver estudantes.</div></section>
+          <section id="dados"><h2>2. Dados registrados</h2><p>Conforme os fluxos utilizados, o sistema pode registrar:</p><ul><li>nome de usuário, e-mail, papel e status da conta;</li><li>senha textual usada pelo contrato atual de autenticação, acessível apenas na base administrativa;</li><li>vila, recursos, escolhas, previsões, resultados e revisões do jogador;</li><li>eventos técnicos e registros de auditoria necessários à operação.</li></ul><p>Não insira nome completo, documento, endereço, informação de saúde ou outro dado desnecessário nos campos de texto livre.</p></section>
+          <section id="finalidades"><h2>3. Para que os dados são usados</h2><ul><li>permitir login e continuidade entre rodadas;</li><li>calcular resultados da simulação e mostrar feedback;</li><li>apoiar revisão pedagógica e conversa coletiva;</li><li>diagnosticar erros, abuso de acesso e integridade da implantação.</li></ul></section>
+          <section id="cuidados"><h2>4. Uso com crianças e adolescentes</h2><p>A escola deve usar identificadores fictícios ou minimizados, informar estudantes e responsáveis de modo compreensível e manter mediação adulta. Resultados do jogo não devem ser tratados como avaliação psicológica, diagnóstico ou decisão automatizada sobre o estudante.</p></section>
+          <section id="retencao"><h2>5. Retenção, acesso e segurança</h2><p>O proprietário da implantação controla a planilha e as permissões. O acesso administrativo deve ser limitado a pessoas autorizadas. Como a autenticação atual preserva senhas em texto plano por decisão de projeto, a implantação exige proteção rigorosa da planilha, credenciais exclusivamente demonstrativas e proibição de reutilizar senhas pessoais.</p></section>
+          <section id="direitos"><h2>6. Consulta, correção e exclusão</h2><p>Solicitações sobre acesso, correção ou exclusão devem ser dirigidas ao responsável institucional pela implantação. O educador deve interromper a atividade e acionar esse responsável sempre que houver dúvida sobre identidade, consentimento ou exposição indevida.</p></section>
+        </article>
+      </div>
+      <footer>Atualizado em 2 de setembro de 2026 · Lago Paranoá — Escola Classe 115 Norte</footer>
+    </div>
+  </main>
+  <script>
+    var LPPrivacy = (function() {
+      'use strict';
+
+      function init() {
+        _bindTocHighlight();
+        _bindBackToTop();
+        _trackVisit();
+      }
+
+      /** Destaca no TOC a seção visível mais próxima do topo da viewport */
+      function _bindTocHighlight() {
+        var sections = document.querySelectorAll('.policy section[id]');
+        var links    = document.querySelectorAll('.toc a');
+        if (!sections.length || !links.length) return;
+
+        function _updateActive() {
+          var current = null;
+          sections.forEach(function(sec) {
+            var rect = sec.getBoundingClientRect();
+            if (rect.top <= 120) current = sec.id;
+          });
+          links.forEach(function(a) {
+            var active = a.getAttribute('href') === '#' + current;
+            a.style.fontWeight = active ? '800' : '';
+            a.style.color      = active ? 'var(--teal)' : '';
+          });
+        }
+
+        window.addEventListener('scroll', _updateActive, { passive: true });
+        _updateActive();
+      }
+
+      /** Adiciona botão flutuante "Voltar ao topo" após 300 px de scroll */
+      function _bindBackToTop() {
+        var btn = document.createElement('button');
+        btn.textContent = '↑ Topo';
+        btn.setAttribute('aria-label', 'Voltar ao topo da página');
+        btn.style.cssText = [
+          'position:fixed;bottom:24px;right:24px;padding:9px 16px',
+          'border:none;border-radius:10px;cursor:pointer',
+          'background:var(--teal);color:#fff;font-size:12px;font-weight:800',
+          'box-shadow:0 4px 16px rgba(11,116,105,.35)',
+          'opacity:0;transition:opacity .25s;z-index:999'
+        ].join(';');
+
+        document.body.appendChild(btn);
+
+        window.addEventListener('scroll', function() {
+          btn.style.opacity = window.scrollY > 300 ? '1' : '0';
+          btn.style.pointerEvents = window.scrollY > 300 ? 'auto' : 'none';
+        }, { passive: true });
+
+        btn.addEventListener('click', function() {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      /** Registra visita ao aviso de privacidade via backend (silencia falhas) */
+      function _trackVisit() {
+        try {
+          if (typeof google !== 'undefined' && google.script && google.script.run) {
+            google.script.run
+              .withFailureHandler(function() { /* silencia */ })
+              .logPrivacyPolicyVisit({ page: 'privacyPolicy', ts: new Date().toISOString() });
+          }
+        } catch (_) { /* silencia fora do GAS */ }
+      }
+
+      return { init: init };
+    }());
+
+    document.addEventListener('DOMContentLoaded', function() { LPPrivacy.init(); });
+  </script>
+</body>
+</html>

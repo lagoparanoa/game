@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Observatório do aquífero compartilhado da Bacia do Paranoá">
+  <title>Observatório hídrico · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#637b75; --line:#d7e7e2; --canvas:#f2f8f6; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c78b30; --danger:#b84a3e; --surface:#fff; --shadow:0 18px 48px rgba(18,67,59,.1); }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 86% -5%, #d7eee7 0, transparent 31rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    button { font:inherit; cursor:pointer; } a { color:inherit; }
+    .shell { min-height:100vh; display:grid; grid-template-columns:238px minmax(0,1fr); }
+    .sidebar { position:sticky; top:0; height:100vh; padding:25px 17px; color:#e8f7f2; background:linear-gradient(180deg,#0a5049,#153b38); }
+    .brand { display:flex; align-items:center; gap:11px; padding:0 9px 29px; }
+    .brand-mark { width:40px; height:40px; display:grid; place-items:center; border-radius:13px; color:#09564e; background:#dff4ed; font-size:21px; }
+    .brand strong,.brand span { display:block; } .brand strong { font-size:14px; } .brand span { margin-top:3px; color:#a9d0c6; font-size:11px; }
+    .nav-label { padding:0 10px 9px; color:#90beb4; text-transform:uppercase; letter-spacing:.13em; font-size:10px; font-weight:800; }
+    nav { display:grid; gap:5px; }
+    .nav-link { display:flex; gap:10px; align-items:center; padding:11px 12px; border-radius:11px; color:#c4dfd8; text-decoration:none; font-size:13px; font-weight:700; }
+    .nav-link:hover,.nav-link.active { color:#fff; background:rgba(255,255,255,.12); }
+    .sidebar-note { margin-top:36px; padding:15px; border:1px solid rgba(255,255,255,.12); border-radius:14px; background:rgba(255,255,255,.06); }
+    .sidebar-note strong { font-size:12px; } .sidebar-note p { margin:6px 0 0; color:#b8d7cf; font-size:11px; line-height:1.55; }
+    .page { min-width:0; padding:25px clamp(18px,4vw,52px) 48px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; max-width:1240px; margin:0 auto 28px; }
+    .breadcrumb { color:var(--muted); font-size:12px; } .breadcrumb strong { color:var(--ink); }
+    .btn { border:0; border-radius:11px; padding:11px 15px; font-weight:800; transition:.15s ease; } .btn:hover { transform:translateY(-1px); }
+    .btn-primary { color:#fff; background:var(--teal); text-decoration:none; } .btn-light { border:1px solid var(--line); color:var(--ink); background:rgba(255,255,255,.78); }
+    .content { max-width:1240px; margin:0 auto; }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) 325px; gap:18px; margin-bottom:20px; }
+    .hero-copy { position:relative; overflow:hidden; padding:clamp(25px,4vw,43px); border-radius:23px; color:#eefaf6; background:linear-gradient(120deg,#0a5c53,#128677); box-shadow:var(--shadow); }
+    .hero-copy::after { content:""; position:absolute; right:-70px; bottom:-115px; width:280px; height:280px; border:1px solid rgba(255,255,255,.18); border-radius:50%; box-shadow:0 0 0 30px rgba(255,255,255,.05),0 0 0 61px rgba(255,255,255,.035); }
+    .eyebrow { position:relative; z-index:1; margin:0 0 10px; color:#afe0d3; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; }
+    h1 { position:relative; z-index:1; max-width:720px; margin:0 0 12px; font-size:clamp(32px,4.8vw,54px); line-height:1.02; letter-spacing:-.045em; }
+    .hero-copy>p:last-child { position:relative; z-index:1; max-width:680px; margin:0; color:#d9f0e9; font-size:14px; line-height:1.7; }
+    .reading { display:flex; flex-direction:column; justify-content:space-between; padding:24px; border:1px solid var(--line); border-radius:23px; background:var(--surface); box-shadow:var(--shadow); }
+    .reading-label { color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:10px; font-weight:850; }
+    .reading-value { margin:11px 0 4px; font-size:38px; font-weight:900; letter-spacing:-.045em; }
+    .pill { display:inline-flex; padding:6px 10px; border-radius:99px; color:#28745c; background:#e4f4ea; font-size:10px; font-weight:900; }
+    .pill.warning { color:#8d621c; background:#fff1d6; } .pill.critical { color:#9b392f; background:#fbe5e1; }
+    .reading small { display:block; padding-top:17px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+    .metric { padding:17px; border:1px solid var(--line); border-radius:15px; background:rgba(255,255,255,.82); }
+    .metric span { display:block; color:var(--muted); font-size:11px; font-weight:750; } .metric strong { display:block; margin:8px 0 3px; font-size:25px; letter-spacing:-.035em; } .metric small { color:#789089; font-size:10px; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(310px,.75fr); gap:18px; align-items:start; }
+    .panel { padding:23px; border:1px solid var(--line); border-radius:19px; background:var(--surface); box-shadow:0 8px 28px rgba(18,67,59,.055); }
+    .panel-header { display:flex; justify-content:space-between; gap:14px; align-items:start; margin-bottom:18px; } .panel h2 { margin:0 0 5px; font-size:20px; letter-spacing:-.025em; } .panel p { margin:0; color:var(--muted); font-size:12px; line-height:1.6; }
+    .chart { min-height:250px; display:flex; align-items:flex-end; gap:8px; padding:24px 8px 8px; border-left:1px solid #dce9e5; border-bottom:1px solid #dce9e5; }
+    .bar-group { min-width:28px; flex:1; display:flex; height:210px; flex-direction:column; justify-content:flex-end; align-items:center; gap:6px; }
+    .bar { width:min(34px,80%); min-height:3px; border-radius:6px 6px 2px 2px; background:linear-gradient(180deg,#30a58f,#0b7469); }
+    .bar-group span { color:var(--muted); font-size:9px; } .bar-group strong { font-size:9px; }
+    .legend { display:flex; flex-wrap:wrap; gap:13px; margin-top:13px; color:var(--muted); font-size:10px; } .legend i { display:inline-block; width:9px; height:9px; margin-right:5px; border-radius:3px; background:var(--teal); }
+    .interpretation { display:grid; gap:11px; }
+    .insight { padding:14px; border-radius:13px; background:#f3f8f6; } .insight strong { display:block; margin-bottom:5px; font-size:12px; } .insight p { font-size:11px; }
+    .question { padding:15px; border-left:4px solid var(--gold); border-radius:0 12px 12px 0; background:#fff8e9; } .question strong { display:block; margin-bottom:6px; font-size:12px; } .question p { color:#72582b; }
+    .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:17px; }
+    .history { grid-column:1/-1; } .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:12px; } th { padding:10px 8px; color:var(--muted); text-align:left; text-transform:uppercase; letter-spacing:.08em; font-size:9px; } td { padding:12px 8px; border-top:1px solid #e8f0ed; } td strong { color:var(--deep); }
+    .empty { padding:28px; border:1px dashed #bad2cb; border-radius:13px; color:var(--muted); text-align:center; font-size:12px; }
+    .message { min-height:19px; margin-top:12px; color:var(--deep); font-size:12px; font-weight:700; } .message.error { color:var(--danger); } .loading { opacity:.58; pointer-events:none; }
+    @media(max-width:980px){ .shell{grid-template-columns:1fr}.sidebar{position:static;width:100%;height:auto}nav{grid-template-columns:repeat(4,minmax(0,1fr))}.sidebar-note,.nav-label{display:none}.brand{padding-bottom:18px}.grid{grid-template-columns:1fr}.history{grid-column:auto} }
+    @media(max-width:700px){ .page{padding:16px 13px 34px}.topbar{align-items:stretch;flex-direction:column}.hero{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}nav{grid-template-columns:1fr 1fr}.nav-link{font-size:11px}.panel{padding:18px}.chart{gap:3px}.bar-group strong{display:none} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="aquiferApp">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="brand"><div class="brand-mark">≈</div><div><strong>Paranoá vivo</strong><span>observatório da bacia</span></div></div>
+      <div class="nav-label">Navegação</div>
+      <nav><a class="nav-link" href="?page=dashboard">⌂ Visão geral</a><a class="nav-link active" href="?page=aquifer" aria-current="page">≈ Observatório</a><a class="nav-link" href="?page=water">◌ Planejar água</a><a class="nav-link" href="?page=climate">☼ Clima</a></nav>
+      <div class="sidebar-note"><strong>Leia a série, não só o valor</strong><p>Uma medição isolada informa o estado. A sequência ajuda a explicar causas e antecipar riscos.</p></div>
+    </aside>
+    <main class="page">
+      <div class="topbar"><div class="breadcrumb">Bacia do Paranoá / <strong>Observatório hídrico</strong></div><button class="btn btn-light" type="button" data-action="refresh">↻ Atualizar medições</button></div>
+      <div class="content">
+        <section class="hero" aria-labelledby="pageTitle">
+          <div class="hero-copy"><p class="eyebrow">Evidência compartilhada</p><h1 id="pageTitle">O aquífero conta a história das escolhas.</h1><p>Observe nível, recarga, extração e evaporação ao longo das rodadas. Use a tendência para formular uma hipótese antes de decidir.</p></div>
+          <aside class="reading" aria-live="polite"><div><div class="reading-label">Medição atual</div><div class="reading-value" id="currentLevel">—</div><span class="pill" id="currentStatus">Carregando</span></div><small id="syncStatus">Conectando à planilha…</small></aside>
+        </section>
+        <section class="metrics" aria-label="Balanço hídrico atual">
+          <article class="metric"><span>Recarga</span><strong id="recharge">—</strong><small>m³ na medição</small></article><article class="metric"><span>Extração</span><strong id="extraction">—</strong><small>m³ na medição</small></article><article class="metric"><span>Evaporação</span><strong id="evaporation">—</strong><small>m³ na medição</small></article><article class="metric"><span>Balanço</span><strong id="balance">—</strong><small>recarga − retirada − evaporação</small></article>
+        </section>
+        <div class="grid">
+          <section class="panel" aria-labelledby="trendTitle"><div class="panel-header"><div><h2 id="trendTitle">Nível por rodada</h2><p>Comparação das últimas medições disponíveis.</p></div></div><div class="chart" id="levelChart" role="img" aria-label="Histórico do nível do aquífero"><div class="empty">Carregando série histórica…</div></div><div class="legend"><span><i></i>Nível registrado em m³</span></div></section>
+          <aside class="panel" aria-labelledby="readingTitle"><div class="panel-header"><div><h2 id="readingTitle">Interpretação</h2><p>Uma leitura curta para orientar a conversa da equipe.</p></div></div><div class="interpretation"><div class="insight"><strong id="trendHeadline">Aguardando dados</strong><p id="trendText">A tendência aparecerá quando houver pelo menos duas medições.</p></div><div class="question"><strong>Hipótese para a próxima rodada</strong><p id="investigationQuestion">Qual variável pode explicar a mudança observada no nível?</p></div></div><div class="actions"><a class="btn btn-primary" href="?page=water">Planejar uso da água</a><a class="btn btn-light" href="?page=climate">Comparar clima</a></div><div class="message" id="pageMessage" role="status" aria-live="polite"></div></aside>
+          <section class="panel history" aria-labelledby="historyTitle"><div class="panel-header"><div><h2 id="historyTitle">Caderno de medições</h2><p>Valores vindos do histórico canônico do serviço de aquífero.</p></div></div><div class="table-wrap"><table><thead><tr><th>Rodada</th><th>Nível</th><th>Recarga</th><th>Extração</th><th>Evaporação</th><th>Situação</th></tr></thead><tbody id="historyRows"><tr><td colspan="6"><div class="empty">Carregando registros…</div></td></tr></tbody></table></div></section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      const state={aquifer:null,history:[]};
+      function byId(id){return document.getElementById(id)}
+      function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:0}
+      function format(value,digits){return number(value).toLocaleString('pt-BR',{maximumFractionDigits:digits==null?0:digits})}
+      function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(char){return({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[char]})}
+      function statusClass(status){const value=String(status||'').toUpperCase();return value==='CRÍTICO'||value==='ERRO'?'critical':value==='ALERTA'?'warning':''}
+      function setMessage(message,error){const target=byId('pageMessage');target.textContent=message||'';target.className='message'+(error?' error':'')}
+      function renderChart(){
+        const chronological=state.history.slice(0,10).reverse();
+        if(!chronological.length){byId('levelChart').innerHTML='<div class="empty">Ainda não há medições para desenhar a série.</div>';return}
+        const levels=chronological.map(function(item){return number(item.depth)});const max=Math.max.apply(null,levels.concat([1]));const min=Math.min.apply(null,levels);const span=Math.max(1,max-min);
+        byId('levelChart').innerHTML=chronological.map(function(item,index){const height=20+((levels[index]-min)/span)*170;return '<div class="bar-group"><strong>'+format(levels[index])+'</strong><div class="bar" style="height:'+Math.round(height)+'px"></div><span>R'+escapeHtml(item.round==null?'—':item.round)+'</span></div>'}).join('');
+        byId('levelChart').setAttribute('aria-label','Nível do aquífero entre '+format(min)+' e '+format(max)+' metros cúbicos nas últimas '+chronological.length+' medições');
+      }
+      function renderHistory(){
+        if(!state.history.length){byId('historyRows').innerHTML='<tr><td colspan="6"><div class="empty">Ainda não há registros hídricos.</div></td></tr>';return}
+        byId('historyRows').innerHTML=state.history.slice(0,12).map(function(item){return '<tr><td>'+escapeHtml(item.round==null?'—':item.round)+'</td><td><strong>'+format(item.depth)+' m³</strong></td><td>'+format(item.recharge)+'</td><td>'+format(item.extraction)+'</td><td>'+format(item.evaporation)+'</td><td>'+escapeHtml(item.status||'SEM DADOS')+'</td></tr>'}).join('')
+      }
+      function renderInterpretation(){
+        const current=state.aquifer||{};const previous=state.history[1];
+        if(!previous||current.depth==null){byId('trendHeadline').textContent='Série ainda insuficiente';byId('trendText').textContent='Registre ao menos duas rodadas para interpretar uma tendência.';return}
+        const delta=number(current.depth)-number(previous.depth);const down=delta<0;
+        byId('trendHeadline').textContent=down?'Nível em redução':'Nível estável ou em recuperação';
+        byId('trendText').textContent='A variação desde a medição anterior foi de '+(delta>0?'+':'')+format(delta)+' m³. Recarga, extração e evaporação devem ser comparadas antes de atribuir uma causa.';
+        byId('investigationQuestion').textContent=down?'A extração cresceu mais do que a recarga, ou a evaporação explica melhor a queda?':'Qual decisão e qual condição climática podem ter contribuído para a recuperação?'
+      }
+      function render(){
+        const aquifer=state.aquifer||{};const status=String(aquifer.status||'SEM DADOS').toUpperCase();const balance=number(aquifer.recharge)-number(aquifer.extraction)-number(aquifer.evaporation);
+        byId('currentLevel').textContent=aquifer.depth==null?'Sem medição':format(aquifer.depth)+' m³';byId('currentStatus').textContent=status;byId('currentStatus').className='pill '+statusClass(status);
+        byId('recharge').textContent=format(aquifer.recharge);byId('extraction').textContent=format(aquifer.extraction);byId('evaporation').textContent=format(aquifer.evaporation);byId('balance').textContent=(balance>0?'+':'')+format(balance);
+        renderChart();renderHistory();renderInterpretation()
+      }
+      async function loadData(announce){
+        byId('aquiferApp').classList.add('loading');byId('syncStatus').textContent='Atualizando medições…';setMessage('',false);
+        try{const result=await API.water.getOverview();const data=API.unwrap(result);state.aquifer=data.aquifer||{};state.history=Array.isArray(data.history)?data.history:[];render();byId('syncStatus').textContent='Dados sincronizados agora';if(announce)setMessage('Medições atualizadas.',false)}
+        catch(error){byId('syncStatus').textContent='Dados indisponíveis';setMessage(error.message||'Não foi possível carregar o observatório.',true)}
+        finally{byId('aquiferApp').classList.remove('loading')}
+      }
+      document.addEventListener('DOMContentLoaded',function(){document.querySelector('[data-action="refresh"]').addEventListener('click',function(){loadData(true)});loadData(false)})
+    })();
+  </script>
+</body>
+</html>

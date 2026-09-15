@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico do Jogo - Lago Paranoá</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+      padding: 2rem;
+    }
+    
+    .history-container { max-width: 1200px; margin: 0 auto; }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #01579b;
+    }
+    
+    .page-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #01579b;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label { color: #757575; font-size: 0.9rem; }
+    
+    .timeline-container {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .timeline {
+      position: relative;
+      padding: 2rem 0;
+    }
+    
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #01579b 0%, #0277bd 100%);
+      border-radius: 2px;
+    }
+    
+    .timeline-item {
+      position: relative;
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+    }
+    
+    .timeline-item:nth-child(odd) { flex-direction: row; }
+    .timeline-item:nth-child(even) { flex-direction: row-reverse; }
+    
+    .timeline-content {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 12px;
+      width: 45%;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .timeline-content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(1,87,155,0.2);
+    }
+    
+    .timeline-marker {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border: 4px solid #01579b;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .timeline-date {
+      color: #01579b;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .timeline-title {
+      font-size: 1.2rem;
+      color: #212121;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+    }
+    
+    .timeline-description {
+      color: #424242;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    
+    .timeline-metrics {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .metric {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .metric-value { font-weight: bold; font-size: 1.1rem; }
+    .metric-value.up { color: #4caf50; }
+    .metric-value.down { color: #f44336; }
+    
+    .metric-label {
+      font-size: 0.75rem;
+      color: #757575;
+      text-align: center;
+      margin-top: 0.3rem;
+    }
+    
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .back-link a {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #01579b;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .back-link a:hover { background: #0277bd; }
+    
+    @media (max-width: 768px) {
+      .timeline::before { left: 20px; }
+      
+      .timeline-item,
+      .timeline-item:nth-child(even) {
+        flex-direction: row;
+        padding-left: 60px;
+      }
+      
+      .timeline-content { width: 100%; }
+      .timeline-marker { left: 20px; transform: none; }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="history-container">
+    <div class="page-header">
+      <h1>📜 Histórico do Jogo</h1>
+      <p>Linha do tempo das grandes crises e sucessos da Bacia do Paranoá</p>
+    </div>
+    
+    <div class="stats-overview">
+      <div class="stat-card">
+        <span class="stat-value" id="total-rounds">0</span>
+        <span class="stat-label">Rodadas Jogadas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="total-crises">0</span>
+        <span class="stat-label">Crises Enfrentadas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="total-decisions">0</span>
+        <span class="stat-label">Decisões Estratégicas</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" id="sustainability-score">0%</span>
+        <span class="stat-label">Sustentabilidade</span>
+      </div>
+    </div>
+    
+    <div class="timeline-container">
+      <div class="timeline" id="timeline"></div>
+    </div>
+    
+    <div class="back-link">
+      <a href="?page=dashboard">← Voltar ao Dashboard</a>
+    </div>
+  </div>
+
+  <?!= include('ApiClient') ?>
+  <script>
+    function appendText(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      element.textContent = text === undefined || text === null ? '' : String(text);
+      parent.appendChild(element);
+      return element;
+    }
+
+    function formatDate(value) {
+      if (!value) return 'data não registrada';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('pt-BR');
+    }
+
+    function scalarMetrics(metrics) {
+      return Object.entries(metrics || {})
+        .filter(([, value]) => typeof value === 'number' || typeof value === 'string')
+        .slice(0, 3);
+    }
+
+    function renderTimeline(records) {
+      const timeline = document.getElementById('timeline');
+      timeline.replaceChildren();
+      if (!records.length) {
+        appendText(timeline, 'p', 'Nenhuma rodada real foi registrada para este jogador.', 'timeline-description');
+        return;
+      }
+
+      records.forEach(record => {
+        const item = document.createElement('article');
+        item.className = 'timeline-item';
+        appendText(item, 'div', '💧', 'timeline-marker');
+        const content = document.createElement('div');
+        content.className = 'timeline-content';
+        appendText(content, 'div', 'Rodada ' + record.round + ' · ' + formatDate(record.createdAt), 'timeline-date');
+        appendText(content, 'h3', record.action || 'Decisão registrada', 'timeline-title');
+        appendText(content, 'p', record.outcome || 'Resultado sem descrição.', 'timeline-description');
+
+        const entries = scalarMetrics(record.metrics);
+        if (entries.length) {
+          const metrics = document.createElement('div');
+          metrics.className = 'timeline-metrics';
+          entries.forEach(([label, value]) => {
+            const metric = document.createElement('div');
+            metric.className = 'metric';
+            appendText(metric, 'span', value, 'metric-value ' + (Number(value) < 0 ? 'down' : 'up'));
+            appendText(metric, 'span', label, 'metric-label');
+            metrics.appendChild(metric);
+          });
+          content.appendChild(metrics);
+        }
+        item.appendChild(content);
+        timeline.appendChild(item);
+      });
+    }
+
+    function showHistoryError(message) {
+      const timeline = document.getElementById('timeline');
+      timeline.replaceChildren();
+      appendText(timeline, 'p', message || 'Erro ao carregar o histórico.', 'timeline-description');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      API.history.rounds(100)
+        .then(result => {
+          if (!result || result.success !== true) throw new Error((result && result.error) || 'Falha ao carregar histórico.');
+          const data = result.data || {};
+          const stats = data.stats || {};
+          document.getElementById('total-rounds').textContent = stats.totalRounds || 0;
+          document.getElementById('total-crises').textContent = stats.totalCrises || 0;
+          document.getElementById('total-decisions').textContent = stats.totalDecisions || 0;
+          document.getElementById('sustainability-score').textContent = (stats.sustainabilityScore || 0) + '%';
+          renderTimeline(data.records || []);
+        })
+        .catch(error => showHistoryError(error.message));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seleção de Culturas - Lago Paranoá</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      padding: 2rem;
+    }
+    
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header p {
+      opacity: 0.9;
+    }
+    
+    .back-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: white;
+      color: #004d40;
+    }
+    
+    .content {
+      padding: 2rem;
+    }
+    
+    .climate-info {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #1976d2;
+    }
+    
+    .climate-info h3 {
+      color: #1565c0;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .climate-info p {
+      color: #424242;
+      font-size: 0.95rem;
+    }
+    
+    .player-resources {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .resource-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .resource-icon {
+      font-size: 1.5rem;
+    }
+    
+    .resource-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #004d40;
+    }
+    
+    .crops-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .crop-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .crop-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      border-color: #004d40;
+    }
+    
+    .crop-card.selected {
+      border-color: #4caf50;
+      border-width: 3px;
+      background: #e8f5e9;
+    }
+    
+    .crop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .crop-name {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #004d40;
+    }
+    
+    .crop-icon {
+      font-size: 2.5rem;
+    }
+    
+    .crop-details {
+      margin-bottom: 1rem;
+    }
+    
+    .crop-detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .crop-detail-item:last-child {
+      border-bottom: none;
+    }
+    
+    .crop-detail-label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .crop-detail-value {
+      font-weight: bold;
+      color: #004d40;
+    }
+    
+    .crop-profitability {
+      background: #fff3e0;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    
+    .crop-profitability.high {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .crop-profitability.medium {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+    
+    .crop-profitability.low {
+      background: #ffebee;
+      color: #c62828;
+    }
+    
+    .plant-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .plant-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(76,175,80,0.4);
+    }
+    
+    .plant-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #004d40;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #c62828;
+      margin-bottom: 1rem;
+    }
+    
+    .success-message {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #4caf50;
+      margin-bottom: 1rem;
+    }
+
+    .cycle-guide, .review-panel { padding: 1rem; border-radius: 10px; margin-bottom: 1.25rem; }
+    .cycle-guide { background: #e3f2fd; border-left: 4px solid #1976d2; color: #173f5f; }
+    .review-panel { background: #fff8e1; border-left: 4px solid #f9a825; }
+    .review-panel h3 { color: #6d4c00; margin-bottom: .65rem; }
+    .evidence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin: .8rem 0; }
+    .evidence-grid article { background: white; border: 1px solid #eadcae; border-radius: 8px; padding: .7rem; display: grid; }
+    .evidence-grid small { color: #666; }
+    .review-panel label, .prediction-field { display: grid; gap: .35rem; margin-top: .75rem; font-weight: 700; }
+    .review-panel textarea, .review-panel input, .prediction-field textarea, .prediction-field input { width: 100%; padding: .7rem; border: 1px solid #bdbdbd; border-radius: 7px; font: inherit; }
+    .review-panel button { margin-top: .8rem; }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 90%;
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-header {
+      margin-bottom: 1rem;
+    }
+    
+    .modal-header h2 {
+      color: #004d40;
+    }
+    
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal-btn-cancel {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .modal-btn-confirm {
+      background: #4caf50;
+      color: white;
+    }
+    
+    .modal-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .crops-grid {
+        grid-template-columns: 1fr;
+      }
+      .evidence-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌾 Seleção de Culturas</h1>
+      <p>Escolha o que plantar baseado nas condições climáticas e seus recursos disponíveis</p>
+      <a href="?page=dashboard" class="back-btn">← Voltar ao Dashboard</a>
+    </div>
+    
+    <div class="content">
+      <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando culturas disponíveis...</p>
+      </div>
+      
+      <div id="error" class="error-message" style="display: none;"></div>
+      <div id="success" class="success-message" style="display: none;"></div>
+      
+      <div id="content" style="display: none;">
+        <div id="cycleGuide" class="cycle-guide" role="status" aria-live="polite"><strong>1 Prever → 2 Decidir → 3 Observar → 4 Explicar → 5 Planejar o próximo teste</strong></div>
+        <section id="reviewPanel" class="review-panel" hidden aria-labelledby="reviewTitle">
+          <h3 id="reviewTitle">Resultado da rodada <span id="reviewRound"></span></h3>
+          <p><strong>Sua previsão:</strong> <span id="reviewPrediction"></span></p>
+          <p id="reviewObservation"></p>
+          <div class="evidence-grid">
+            <article><small>Água usada</small><strong id="reviewWater">0</strong></article>
+            <article><small>Produção</small><strong id="reviewYield">0</strong></article>
+            <article><small>Variação sustentável</small><strong id="reviewSustainability">0</strong></article>
+          </div>
+          <label for="roundReflection">O resultado confirmou sua previsão? Explique usando um indicador.</label>
+          <textarea id="roundReflection" rows="3" maxlength="800"></textarea>
+          <label for="roundNextTest">O que você mudará no próximo teste?</label>
+          <input inputmode="text" id="roundNextTest" maxlength="420">
+          <button id="saveReviewButton" class="plant-btn" type="button" onclick="saveRoundReview()">Registrar revisão e liberar nova rodada</button>
+        </section>
+        <!-- Climate Info -->
+        <div class="climate-info">
+          <h3><span>🌦️</span> Condições Climáticas Atuais</h3>
+          <p><strong>Estação:</strong> <span id="climateSeason">Carregando...</span></p>
+          <p><strong>Precipitação:</strong> <span id="climateRain">0</span> mm</p>
+          <p><strong>Temperatura:</strong> <span id="climateTemp">0</span>°C</p>
+          <p id="climateImpact" style="margin-top: 0.5rem; font-style: italic;"></p>
+        </div>
+        
+        <!-- Player Resources -->
+        <div class="player-resources">
+          <div class="resource-item">
+            <span class="resource-icon">💧</span>
+            <div>
+              <div style="font-size: 0.85rem; color: #666;">Água Disponível</div>
+              <div class="resource-value"><span id="playerWater">0</span> créditos</div>
+            </div>
+          </div>
+          <div class="resource-item">
+            <span class="resource-icon">🌾</span>
+            <div>
+              <div style="font-size: 0.85rem; color: #666;">Alimento</div>
+              <div class="resource-value"><span id="playerFood">0</span> unidades</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Crops Grid -->
+        <div id="cropsContainer" class="crops-grid">
+          <!-- Crops will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Confirmar Plantio</h2>
+      </div>
+      <div class="modal-body">
+        <div class="modal-detail">
+          <span>Cultura:</span>
+          <strong id="modalCropName">-</strong>
+        </div>
+        <label class="prediction-field" for="predictionInput">Minha previsão antes do teste
+          <textarea id="predictionInput" rows="3" maxlength="420" placeholder="Eu penso que esta escolha vai… porque…"></textarea>
+        </label>
+        <label class="prediction-field" for="waterInput">Água que será usada
+          <input inputmode="decimal" id="waterInput" type="number" min="1" step="1">
+        </label>
+        <div class="modal-detail">
+          <span>Água necessária:</span>
+          <strong id="modalWaterCost">0</strong>
+        </div>
+        <div class="modal-detail">
+          <span>Tempo de colheita:</span>
+          <strong id="modalGrowthTime">1 rodada</strong>
+        </div>
+        <div class="modal-detail">
+          <span>Lucro estimado:</span>
+          <strong style="color: #4caf50;" id="modalProfit">$0</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmPlant()">Executar teste</button>
+      </div>
+    </div>
+  </div>
+  
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+  <?!= include('UIComponents'); ?>
+
+  <script>
+    let currentPlayerId = null;
+    let currentPlayer = null;
+    let selectedCrop = null;
+    let pendingHistoryId = null;
+    
+    window.addEventListener('DOMContentLoaded', function() {
+      loadData();
+    });
+    
+    function loadData() {
+      API.player.getCurrent()
+        .then(onUserLoaded)
+        .catch(onError);
+    }
+    
+    function onUserLoaded(result) {
+      if (!result.success) {
+        showError(result.error || 'Erro ao carregar dados do usuário');
+        return;
+      }
+      
+      currentPlayerId = result.data.playerId;
+      currentPlayer = result.data.player;
+      StateManager.setPlayer(currentPlayer);
+      
+      // Atualizar recursos do jogador na UI
+      document.getElementById('playerWater').textContent = currentPlayer.waterCredits;
+      document.getElementById('playerFood').textContent = currentPlayer.foodUnits;
+      
+      // Carregar culturas disponíveis
+      Promise.all([API.crops.getAll(), API.round.getStatus(currentPlayerId)])
+        .then(function(results) { onCropsLoaded(results[0], results[1]); })
+        .catch(onError);
+    }
+    
+    function onCropsLoaded(result, statusResult) {
+      if (!result.success) {
+        showError(result.error || 'Erro ao carregar culturas');
+        return;
+      }
+      
+      const crops = result.data.crops;
+      const climate = result.data.climate;
+      StateManager.setClimate(climate || null);
+      
+      // Atualizar informações do clima
+      if (climate) {
+        document.getElementById('climateSeason').textContent = climate.season || 'Desconhecido';
+        document.getElementById('climateRain').textContent = climate.rainValue || 0;
+        document.getElementById('climateTemp').textContent = climate.temperature || 25;
+        
+        const impact = climate.season === 'Úmido' ? '+20% rendimento' : 'Rendimento normal';
+        document.getElementById('climateImpact').textContent = impact;
+      }
+      
+      // Renderizar culturas
+      const container = document.getElementById('cropsContainer');
+      container.innerHTML = crops.map(crop => renderCropCard(crop, climate)).join('');
+      
+      // Mostrar conteúdo
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      const pending = statusResult && statusResult.success && statusResult.data ? statusResult.data.pendingReview : null;
+      if (pending) showRoundReview(pending.historyId, pending.round, pending.metrics);
+    }
+    
+    function renderCropCard(crop, climate) {
+      const waterCost = crop.waterNeed;
+      const estimatedYield = crop.yieldPerCycle * (climate.season === 'Úmido' ? 1.2 : 1.0);
+      const profit = Math.round(estimatedYield * crop.marketPrice - waterCost * 0.5);
+      
+      let profitClass = 'medium';
+      if (profit > 800) profitClass = 'high';
+      else if (profit < 400) profitClass = 'low';
+      
+      const canAfford = currentPlayer.waterCredits >= waterCost;
+      
+      return `
+        <div class="crop-card" onclick="selectCrop('${crop.cropId}', ${canAfford})">
+          <div class="crop-header">
+            <div class="crop-name">${crop.name}</div>
+            <div class="crop-icon">${getCropIcon(crop.name)}</div>
+          </div>
+          <div class="crop-details">
+            <div class="crop-detail-item">
+              <span class="crop-detail-label">💧 Água</span>
+              <span class="crop-detail-value">${waterCost} créditos</span>
+            </div>
+            <div class="crop-detail-item">
+              <span class="crop-detail-label">📊 Rendimento</span>
+              <span class="crop-detail-value">${estimatedYield.toFixed(0)}t</span>
+            </div>
+            <div class="crop-detail-item">
+              <span class="crop-detail-label">💰 Preço</span>
+              <span class="crop-detail-value">$${crop.marketPrice}</span>
+            </div>
+            <div class="crop-detail-item">
+              <span class="crop-detail-label">⏱️ Crescimento</span>
+              <span class="crop-detail-value">${crop.growthDays} dia(s)</span>
+            </div>
+          </div>
+          <div class="crop-profitability ${profitClass}">
+            <strong>Lucro Estimado: $${profit}</strong>
+          </div>
+          <button class="plant-btn" type="button" onclick="event.stopPropagation(); selectCrop('${crop.cropId}', ${canAfford})" ${!canAfford ? 'disabled' : ''}>
+            ${canAfford ? '🧪 Testar rodada' : '❌ Água Insuficiente'}
+          </button>
+        </div>
+      `;
+    }
+    
+    function getCropIcon(name) {
+      const icons = {
+        'Milho': '🌽',
+        'Soja': '🫘',
+        'Trigo': '🌾',
+        'Arroz': '🌾',
+        'Feijão': '🫘'
+      };
+      return icons[name] || '🌱';
+    }
+    
+    function selectCrop(cropId, canAfford) {
+      if (pendingHistoryId) {
+        showError('Registre a revisão da rodada atual antes de iniciar outro teste.');
+        document.getElementById('reviewPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      if (!canAfford) {
+        showError('Você não tem água suficiente para plantar esta cultura!');
+        return;
+      }
+      
+      // Buscar dados da cultura
+      API.crops.getAll()
+        .then(function(result) {
+          if (result.success) {
+            openModal(result.data.crops.find(c => c.cropId === cropId));
+          }
+        })
+        .catch(onError);
+    }
+    
+    function openModal(crop) {
+      if (!crop) return;
+      
+      selectedCrop = crop;
+      
+      const waterCost = crop.waterNeed;
+      const profit = Math.round(crop.yieldPerCycle * crop.marketPrice - waterCost * 0.5);
+      
+      document.getElementById('modalCropName').textContent = crop.name;
+      document.getElementById('modalWaterCost').textContent = waterCost + ' créditos';
+      document.getElementById('modalGrowthTime').textContent = crop.growthDays + ' dia(s)';
+      document.getElementById('modalProfit').textContent = '$' + profit;
+      document.getElementById('waterInput').value = crop.waterNeed;
+      document.getElementById('waterInput').max = currentPlayer.waterCredits;
+      document.getElementById('predictionInput').value = '';
+      
+      document.getElementById('confirmModal').classList.add('active');
+    }
+    
+    function closeModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      selectedCrop = null;
+    }
+    
+    function confirmPlant() {
+      if (!selectedCrop) return;
+      const prediction = document.getElementById('predictionInput').value.trim();
+      const waterUsed = Number(document.getElementById('waterInput').value);
+      if (prediction.length < 12) {
+        showError('Registre uma previsão em pelo menos 12 caracteres antes do teste.');
+        document.getElementById('predictionInput').focus();
+        return;
+      }
+      if (!Number.isFinite(waterUsed) || waterUsed <= 0) {
+        showError('Informe uma quantidade válida de água.');
+        document.getElementById('waterInput').focus();
+        return;
+      }
+      const crop = selectedCrop;
+      closeModal();
+      
+      // Mostrar loading
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+      
+      API.round.run(currentPlayerId, { cropId: crop.cropId, quantity: 1, waterUsed, prediction })
+        .then(onPlantSuccess)
+        .catch(onError);
+    }
+    
+    function onPlantSuccess(result) {
+      if (result.success) {
+        currentPlayer = result.data.player;
+        document.getElementById('playerWater').textContent = currentPlayer.waterCredits;
+        document.getElementById('playerFood').textContent = currentPlayer.foodUnits;
+        const roundResult = result.data.result;
+        showRoundReview(result.data.historyId, roundResult.round, GameRoundMetrics(roundResult));
+        showSuccess(result.message);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } else {
+        showError(result.error || 'Erro ao plantar cultura');
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      }
+    }
+
+    function GameRoundMetrics(result) {
+      return {
+        waterUsed: result.outcome.waterUsed,
+        yieldUnits: result.outcome.yieldUnits,
+        sustainabilityDelta: result.outcome.sustainabilityDelta,
+        learning: {
+          prediction: result.action.prediction,
+          observation: result.narrative && result.narrative.message || result.reflection,
+          status: 'awaiting_review'
+        }
+      };
+    }
+
+    function showRoundReview(historyId, round, metrics) {
+      metrics = metrics || {};
+      const learning = metrics.learning || {};
+      pendingHistoryId = historyId;
+      document.getElementById('reviewRound').textContent = round;
+      document.getElementById('reviewPrediction').textContent = learning.prediction || 'Previsão não disponível';
+      document.getElementById('reviewObservation').textContent = learning.observation || 'Compare os indicadores observados.';
+      document.getElementById('reviewWater').textContent = Number(metrics.waterUsed || 0).toFixed(1);
+      document.getElementById('reviewYield').textContent = Number(metrics.yieldUnits || 0).toFixed(1);
+      const delta = Number(metrics.sustainabilityDelta || 0);
+      document.getElementById('reviewSustainability').textContent = (delta > 0 ? '+' : '') + delta.toFixed(1);
+      document.getElementById('reviewPanel').hidden = false;
+      document.getElementById('cropsContainer').setAttribute('aria-hidden', 'true');
+      document.getElementById('cycleGuide').textContent = '4 Explique o resultado e registre o próximo teste para liberar outra rodada.';
+      document.getElementById('reviewPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function saveRoundReview() {
+      const reflection = document.getElementById('roundReflection').value.trim();
+      const nextTest = document.getElementById('roundNextTest').value.trim();
+      if (reflection.length < 12 || nextTest.length < 8) {
+        showError('Registre uma explicação e um próximo teste antes de continuar.');
+        return;
+      }
+      const button = document.getElementById('saveReviewButton');
+      button.disabled = true;
+      button.textContent = 'Registrando…';
+      API.round.review(currentPlayerId, pendingHistoryId, reflection, nextTest)
+        .then(function(result) {
+          if (!result.success) throw new Error(result.error || 'Não foi possível registrar a revisão.');
+          pendingHistoryId = null;
+          document.getElementById('reviewPanel').hidden = true;
+          document.getElementById('cropsContainer').removeAttribute('aria-hidden');
+          document.getElementById('cycleGuide').innerHTML = '<strong>1 Prever → 2 Decidir → 3 Observar → 4 Explicar → 5 Planejar o próximo teste</strong>';
+          showSuccess(result.message);
+        })
+        .catch(onError)
+        .finally(function() { button.disabled = false; button.textContent = 'Registrar revisão e liberar nova rodada'; });
+    }
+    
+    function onError(error) {
+      showError(error.message || 'Erro desconhecido');
+      document.getElementById('loading').style.display = 'none';
+    }
+    
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = '❌ ' + message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    function showSuccess(message) {
+      const successDiv = document.getElementById('success');
+      successDiv.textContent = '✅ ' + message;
+      successDiv.style.display = 'block';
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

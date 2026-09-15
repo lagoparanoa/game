@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestão territorial participativa da Bacia do Paranoá">
+  <title>Gestão territorial · Bacia do Paranoá</title>
+  <style>
+    :root {
+      --ink: #173b36;
+      --muted: #667b77;
+      --line: #dce9e4;
+      --surface: #ffffff;
+      --canvas: #f3f8f6;
+      --teal: #0e7468;
+      --teal-dark: #07564f;
+      --mint: #dff3eb;
+      --gold: #c68d32;
+      --coral: #c85d4d;
+      --shadow: 0 18px 50px rgba(23, 59, 54, 0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 80% -10%, rgba(179, 225, 210, 0.55), transparent 32rem),
+        var(--canvas);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    a { color: inherit; }
+
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: 252px minmax(0, 1fr); }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 26px 18px;
+      color: #e8f7f2;
+      background: linear-gradient(180deg, #0b4f49, #123d3a 70%, #173a36);
+    }
+
+    .brand { display: flex; gap: 11px; align-items: center; padding: 0 10px 30px; }
+    .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; color: #0a5c52; background: #d9f1e9; font-size: 22px; }
+    .brand strong { display: block; font-size: 15px; letter-spacing: .01em; }
+    .brand span { display: block; margin-top: 3px; color: #a8d0c5; font-size: 11px; }
+
+    .nav-label { padding: 0 11px 9px; color: #92c4b8; text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 800; }
+    .main-nav { display: grid; gap: 5px; }
+    .nav-link { display: flex; align-items: center; gap: 11px; padding: 11px 12px; border-radius: 11px; color: #c4e2da; text-decoration: none; font-size: 13px; font-weight: 650; transition: .2s ease; }
+    .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,.12); }
+    .nav-link.active { box-shadow: inset 3px 0 var(--gold); }
+    .nav-icon { width: 20px; text-align: center; font-size: 16px; }
+
+    .sidebar-note { margin-top: auto; padding: 16px; border: 1px solid rgba(217,241,233,.14); border-radius: 15px; background: rgba(255,255,255,.07); }
+    .sidebar-note b { display: block; margin-bottom: 5px; font-size: 12px; }
+    .sidebar-note p { margin: 0; color: #b7d8cf; font-size: 11px; line-height: 1.55; }
+
+    .page { min-width: 0; padding: 25px clamp(18px, 4vw, 54px) 48px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 18px; max-width: 1400px; margin: 0 auto 34px; }
+    .breadcrumb { color: var(--muted); font-size: 12px; }
+    .breadcrumb strong { color: var(--ink); }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+    .user-chip { display: flex; align-items: center; gap: 9px; padding: 7px 11px 7px 7px; border: 1px solid var(--line); border-radius: 99px; background: rgba(255,255,255,.72); font-size: 12px; font-weight: 700; }
+    .avatar { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: #fff; background: var(--teal); font-size: 12px; }
+
+    .content { max-width: 1400px; margin: 0 auto; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 345px; gap: 24px; align-items: stretch; margin-bottom: 24px; }
+    .hero-copy { padding: clamp(24px, 4vw, 44px); border-radius: 24px; color: #effaf6; background: linear-gradient(122deg, #0b5c53, #148879); box-shadow: var(--shadow); overflow: hidden; position: relative; }
+    .hero-copy::after { content: ""; position: absolute; right: -62px; bottom: -100px; width: 270px; height: 270px; border: 1px solid rgba(255,255,255,.17); border-radius: 50%; box-shadow: 0 0 0 28px rgba(255,255,255,.05), 0 0 0 57px rgba(255,255,255,.04); }
+    .eyebrow { margin: 0 0 11px; color: #aee0d1; text-transform: uppercase; letter-spacing: .16em; font-size: 11px; font-weight: 800; }
+    h1, h2, h3, p { position: relative; z-index: 1; }
+    h1 { max-width: 680px; margin: 0 0 13px; font-size: clamp(30px, 4.6vw, 54px); letter-spacing: -.045em; line-height: 1.02; }
+    .hero-copy p { max-width: 640px; margin: 0; color: #d8f0e9; font-size: 14px; line-height: 1.7; }
+    .hero-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+
+    .round-card { display: flex; flex-direction: column; justify-content: space-between; padding: 25px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); box-shadow: var(--shadow); }
+    .round-card .card-kicker { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 800; }
+    .round-number { margin: 12px 0 2px; color: var(--teal-dark); font-size: 46px; font-weight: 800; letter-spacing: -.06em; }
+    .round-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .health { display: flex; align-items: center; gap: 9px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); color: #3f7867; font-size: 12px; font-weight: 700; }
+    .health-dot { width: 9px; height: 9px; border-radius: 50%; background: #42a978; box-shadow: 0 0 0 4px #e1f3e9; }
+
+    .toolbar { display: flex; justify-content: space-between; align-items: end; gap: 15px; margin: 0 0 18px; }
+    .section-heading h2 { margin: 0 0 5px; font-size: 21px; letter-spacing: -.025em; }
+    .section-heading p { margin: 0; color: var(--muted); font-size: 13px; }
+    .search { min-width: min(320px, 100%); position: relative; }
+    .search input { width: 100%; padding: 11px 14px 11px 37px; border: 1px solid var(--line); border-radius: 11px; outline: none; color: var(--ink); background: rgba(255,255,255,.86); }
+    .search input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,116,104,.12); }
+    .search-icon { position: absolute; left: 13px; top: 10px; color: var(--muted); }
+
+    .filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 17px; scrollbar-width: thin; }
+    .filter-btn { flex: 0 0 auto; padding: 9px 14px; border: 1px solid var(--line); border-radius: 99px; color: #54706a; background: rgba(255,255,255,.72); font-size: 12px; font-weight: 750; transition: .2s ease; }
+    .filter-btn:hover, .filter-btn.active { color: #fff; border-color: var(--teal); background: var(--teal); }
+
+    .summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .summary-card { padding: 17px 18px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.82); }
+    .summary-card .label { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .summary-card .value { margin-top: 9px; color: var(--ink); font-size: 25px; font-weight: 800; letter-spacing: -.04em; }
+    .summary-card .hint { margin-top: 3px; color: #73918a; font-size: 11px; }
+
+    .territory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(265px, 1fr)); gap: 14px; }
+    .territory-card { display: flex; min-height: 248px; flex-direction: column; padding: 19px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); box-shadow: 0 7px 24px rgba(23,59,54,.05); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+    .territory-card:hover, .territory-card.selected { transform: translateY(-2px); border-color: #9bcfc0; box-shadow: 0 12px 28px rgba(14,116,104,.11); }
+    .territory-top { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+    .territory-region { margin-bottom: 7px; color: var(--teal); text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 800; }
+    .territory-card h3 { margin: 0; font-size: 18px; letter-spacing: -.025em; }
+    .status { padding: 5px 8px; border-radius: 99px; color: #367b61; background: #e7f6ec; font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .status.mine { color: #88611e; background: #fff2d9; }
+    .territory-description { min-height: 38px; margin: 13px 0 16px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .meter-line { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11px; font-weight: 750; }
+    .meter-line span:first-child { color: var(--muted); }
+    .meter-line span:last-child { color: var(--teal); }
+    .meter { height: 7px; overflow: hidden; border-radius: 99px; background: #e7f0ed; }
+    .meter i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #dbac52, #23a081); }
+    .territory-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 16px; }
+    .territory-stat { padding: 8px 6px; border-radius: 9px; background: #f5f9f7; text-align: center; }
+    .territory-stat b { display: block; font-size: 13px; }
+    .territory-stat span { color: var(--muted); font-size: 9px; }
+    .card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 16px; }
+
+    .btn { display: inline-flex; justify-content: center; align-items: center; gap: 7px; padding: 10px 14px; border: 1px solid transparent; border-radius: 10px; font-size: 12px; font-weight: 800; transition: .2s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { color: #fff; background: var(--teal); }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-light { color: var(--teal-dark); border-color: var(--line); background: #f7fbf9; }
+    .btn-light:hover { border-color: #a2d2c4; background: var(--mint); }
+    .btn-ghost { color: #d8f0e9; border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.08); }
+    .btn-ghost:hover { background: rgba(255,255,255,.16); }
+    .btn-gold { color: #fff; background: var(--gold); }
+    .btn-gold:hover { background: #a97725; }
+    .btn[disabled] { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .detail-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(300px, .65fr); gap: 18px; margin-top: 30px; }
+    .detail-panel, .decision-panel, .history-panel { padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 7px 25px rgba(23,59,54,.05); }
+    .detail-header { display: flex; justify-content: space-between; align-items: start; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .detail-header h2 { margin: 0 0 6px; font-size: 25px; letter-spacing: -.04em; }
+    .detail-header p { margin: 0; color: var(--muted); font-size: 12px; }
+    .score { flex: 0 0 auto; width: 72px; height: 72px; display: grid; place-content: center; border: 7px solid #d9efe8; border-right-color: #1e9c83; border-radius: 50%; text-align: center; }
+    .score b { font-size: 20px; line-height: 1; }
+    .score span { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .detail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+    .detail-metric { padding: 12px; border-radius: 11px; background: #f5f9f7; }
+    .detail-metric span { display: block; color: var(--muted); font-size: 10px; }
+    .detail-metric b { display: block; margin-top: 5px; font-size: 18px; }
+    .insight { display: flex; gap: 12px; align-items: start; padding: 14px; border: 1px solid #f1dfb9; border-radius: 12px; color: #705526; background: #fff9ec; font-size: 12px; line-height: 1.55; }
+    .insight strong { display: block; margin-bottom: 3px; color: #8d681d; }
+    .detail-footer { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+
+    .decision-panel h3, .history-panel h3 { margin: 0 0 5px; font-size: 17px; letter-spacing: -.02em; }
+    .decision-panel > p, .history-panel > p { margin: 0 0 17px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .decision-list { display: grid; gap: 9px; }
+    .decision-item { display: flex; gap: 10px; align-items: start; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: #fbfdfc; }
+    .decision-icon { display: grid; place-items: center; width: 29px; height: 29px; flex: 0 0 auto; border-radius: 9px; background: var(--mint); }
+    .decision-item strong { display: block; margin: 1px 0 3px; font-size: 12px; }
+    .decision-item span { display: block; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .decision-item .btn { margin: 9px 0 0; padding: 7px 9px; font-size: 10px; }
+    .history-panel { grid-column: 1 / -1; display: none; }
+    .history-panel.visible { display: block; }
+    .history-list { display: grid; gap: 8px; }
+    .history-row { display: flex; justify-content: space-between; gap: 15px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .history-row:last-child { border-bottom: 0; }
+    .history-row strong { display: block; margin-bottom: 3px; }
+    .history-row span { color: var(--muted); font-size: 11px; }
+    .sync-badge { color: #3c8369 !important; font-weight: 800; white-space: nowrap; }
+
+    .empty { grid-column: 1 / -1; padding: 36px 20px; border: 1px dashed #b9d5cb; border-radius: 17px; color: var(--muted); background: rgba(255,255,255,.6); text-align: center; }
+    .empty strong { display: block; margin-bottom: 5px; color: var(--ink); }
+    .loading-state { padding: 35px 20px; color: var(--muted); text-align: center; }
+    .spinner { display: inline-block; width: 22px; height: 22px; margin-bottom: 9px; border: 3px solid #d8e8e3; border-top-color: var(--teal); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-backdrop { position: fixed; z-index: 30; inset: 0; display: none; place-items: center; padding: 18px; background: rgba(10, 34, 31, .52); backdrop-filter: blur(4px); }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(100%, 510px); max-height: min(700px, 92vh); overflow: auto; padding: 25px; border-radius: 20px; background: #fff; box-shadow: 0 25px 80px rgba(0,0,0,.25); }
+    .modal-header { display: flex; justify-content: space-between; align-items: start; gap: 16px; margin-bottom: 17px; }
+    .modal-header h2 { margin: 0 0 5px; font-size: 21px; letter-spacing: -.03em; }
+    .modal-header p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .close-btn { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; color: var(--muted); background: #f3f7f5; font-size: 18px; }
+    .impact-box { padding: 14px; border-radius: 12px; background: #f2faf7; }
+    .impact-box strong { display: block; margin-bottom: 4px; color: var(--teal-dark); font-size: 12px; }
+    .impact-box p { margin: 0; color: #526f68; font-size: 12px; line-height: 1.55; }
+    .field { margin-top: 15px; }
+    .field label { display: block; margin-bottom: 6px; color: var(--ink); font-size: 11px; font-weight: 800; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .field input, .field select, .field textarea { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fff; }
+    .field textarea { min-height: 82px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14,116,104,.12); }
+    .modal-actions { display: flex; justify-content: end; gap: 9px; margin-top: 20px; }
+    .modal-message { min-height: 17px; margin-top: 10px; color: var(--coral); font-size: 11px; }
+
+    .toast { position: fixed; z-index: 50; right: 22px; bottom: 22px; display: flex; gap: 10px; align-items: center; max-width: min(390px, calc(100vw - 44px)); padding: 13px 15px; border: 1px solid #b9dfd2; border-radius: 12px; color: #1e5147; background: #edfaf5; box-shadow: 0 12px 35px rgba(23,59,54,.16); font-size: 12px; font-weight: 750; transform: translateY(20px); opacity: 0; pointer-events: none; transition: .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { border-color: #efc5bd; color: #873f35; background: #fff2ef; }
+
+    @media (max-width: 1000px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; padding: 15px 18px; }
+      .brand { padding: 0 4px 14px; }
+      .main-nav { display: flex; overflow-x: auto; }
+      .nav-link { flex: 0 0 auto; }
+      .nav-label, .sidebar-note { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .round-card { min-height: 175px; }
+    }
+
+    @media (max-width: 680px) {
+      .page { padding: 16px 14px 34px; }
+      .topbar, .toolbar { align-items: stretch; flex-direction: column; }
+      .top-actions { justify-content: space-between; }
+      .hero-copy { padding: 27px 22px; }
+      h1 { font-size: 36px; }
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .detail-layout { grid-template-columns: 1fr; }
+      .detail-metrics { grid-template-columns: repeat(2, 1fr); }
+      .field-grid { grid-template-columns: 1fr; }
+      .search { min-width: 0; }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="app">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="brand">
+        <div class="brand-mark">◒</div>
+        <div><strong>Paranoá vivo</strong><span>gestão territorial</span></div>
+      </div>
+      <div class="nav-label">Navegação</div>
+      <nav class="main-nav">
+        <a class="nav-link" href="?page=dashboard" target="_top"><span class="nav-icon">⌂</span> Visão geral</a>
+        <a class="nav-link active" href="?page=village" target="_top" aria-current="page"><span class="nav-icon">⌘</span> Territórios</a>
+        <a class="nav-link" href="?page=aquifer" target="_top"><span class="nav-icon">◌</span> Água e aquífero</a>
+        <a class="nav-link" href="?page=climate" target="_top"><span class="nav-icon">☼</span> Clima</a>
+        <a class="nav-link" href="?page=reports" target="_top"><span class="nav-icon">▤</span> Relatórios</a>
+      </nav>
+      <div class="sidebar-note">
+        <b>Uma bacia, muitas escolhas</b>
+        <p>Compare impactos antes de agir e registre decisões que protegem o território.</p>
+      </div>
+    </aside>
+
+    <main class="page">
+      <div class="topbar">
+        <div class="breadcrumb">Bacia do Paranoá <span aria-hidden="true">/</span> <strong>Gestão territorial</strong></div>
+        <div class="top-actions">
+          <div class="user-chip"><span class="avatar" id="userAvatar">?</span><span id="userName">Gestor(a)</span></div>
+          <a class="btn btn-light" href="?page=dashboard" target="_top">← Painel</a>
+        </div>
+      </div>
+
+      <div class="content">
+        <section class="hero" aria-labelledby="pageTitle">
+          <div class="hero-copy">
+            <p class="eyebrow">Distrito Federal · decisão por evidências</p>
+            <h1 id="pageTitle">Decisões que mantêm o território vivo.</h1>
+            <p>Explore as comunidades da Bacia do Paranoá, entenda seus limites e escolha intervenções que equilibram moradia, água e preservação.</p>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-ghost" data-action="refresh">↻ Atualizar dados</button>
+              <button type="button" class="btn btn-gold" data-action="export">↓ Exportar síntese</button>
+            </div>
+          </div>
+          <div class="round-card" aria-live="polite">
+            <div>
+              <div class="card-kicker">Painel territorial</div>
+              <div class="round-number" id="roundNumber">01</div>
+              <p id="roundDescription">Leitura inicial das regiões e seus indicadores de sustentabilidade.</p>
+            </div>
+            <div class="health"><span class="health-dot"></span><span id="dataStatus">Conectando aos dados da bacia…</span></div>
+          </div>
+        </section>
+
+        <section aria-labelledby="territoriesTitle">
+          <div class="toolbar">
+            <div class="section-heading"><h2 id="territoriesTitle">Territórios em foco</h2><p>Selecione uma região para comparar comunidades e abrir seus detalhes.</p></div>
+            <div class="search"><span class="search-icon" aria-hidden="true">⌕</span><input inputmode="search" id="territorySearch" type="search" placeholder="Localizar território" aria-label="Localizar território"></div>
+          </div>
+          <div class="filters" id="regionFilters" role="tablist" aria-label="Filtrar por região"></div>
+          <div class="summary-grid" id="summaryGrid" aria-live="polite"></div>
+          <div class="territory-grid" id="territoryGrid"><div class="loading-state"><span class="spinner"></span><div>Preparando a leitura das regiões…</div></div></div>
+        </section>
+
+        <section class="detail-layout" aria-live="polite">
+          <article class="detail-panel" id="detailPanel"></article>
+          <aside class="decision-panel" id="decisionPanel"></aside>
+          <article class="history-panel" id="historyPanel"></article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="decisionModal" role="dialog" aria-modal="true" aria-labelledby="decisionModalTitle">
+    <div class="modal">
+      <div class="modal-header"><div><h2 id="decisionModalTitle">Avaliar decisão</h2><p id="decisionModalSubtitle"></p></div><button type="button" class="close-btn" data-action="close-modal" aria-label="Fechar">×</button></div>
+      <div class="impact-box"><strong id="decisionImpactTitle">Impacto esperado</strong><p id="decisionImpact"></p></div>
+      <div class="field"><label for="decisionNote">Observação da equipe (opcional)</label><textarea id="decisionNote" maxlength="240" placeholder="O que deve ser observado na próxima rodada?"></textarea></div>
+      <div class="modal-message" id="modalMessage"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-light" data-action="close-modal">Cancelar</button><button type="button" class="btn btn-primary" data-action="confirm-decision">Registrar decisão</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="shorelineModal" role="dialog" aria-modal="true" aria-labelledby="shorelineModalTitle">
+    <div class="modal">
+      <div class="modal-header"><div><h2 id="shorelineModalTitle">Registrar leitura da orla</h2><p id="shorelineModalSubtitle"></p></div><button type="button" class="close-btn" data-action="close-modal" aria-label="Fechar">×</button></div>
+      <div class="impact-box"><strong>Evidência, não estimativa</strong><p>Informe medições observadas. O servidor calcula a conformidade e registra a leitura no histórico da vila.</p></div>
+      <div class="field-grid">
+        <div class="field"><label for="shoreTotal">Extensão observada (m)</label><input inputmode="decimal" id="shoreTotal" type="number" min="1" max="100000" step="1" required></div>
+        <div class="field"><label for="shoreOccupied">Trecho ocupado irregularmente (m)</label><input inputmode="decimal" id="shoreOccupied" type="number" min="0" max="100000" step="1" required></div>
+        <div class="field"><label for="shoreForest">Mata ciliar preservada (%)</label><input inputmode="decimal" id="shoreForest" type="number" min="0" max="100" step="1" required></div>
+        <div class="field"><label for="shoreDistance">Distância da intervenção à água (m)</label><input inputmode="decimal" id="shoreDistance" type="number" min="0" max="100000" step="0.1" required></div>
+      </div>
+      <div class="field"><label for="shoreIntervention">Intervenção observada</label><select id="shoreIntervention"><option value="PUBLIC_PARK">Parque público ecológico</option><option value="REFORESTATION">Reflorestamento de mata ciliar</option><option value="PIER_PUBLIC">Trapiche público com acesso livre</option><option value="FENCE_PRIVATE">Cerca privativa irregular</option><option value="DEFORESTATION">Supressão de vegetação nativa</option><option value="ILLEGAL_CONSTRUCTION">Edificação irregular em APP</option></select></div>
+      <div class="field"><label for="shoreNote">Observação de campo (opcional)</label><textarea id="shoreNote" maxlength="420" placeholder="Descreva a evidência observada e o ponto de referência."></textarea></div>
+      <div class="modal-message" id="shorelineMessage" role="status"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-light" data-action="close-modal">Cancelar</button><button type="button" class="btn btn-primary" data-action="confirm-shoreline">Registrar medição</button></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="joinModal" role="dialog" aria-modal="true" aria-labelledby="joinModalTitle">
+    <div class="modal">
+      <div class="modal-header"><div><h2 id="joinModalTitle">Participar do território</h2><p id="joinModalSubtitle"></p></div><button type="button" class="close-btn" data-action="close-modal">×</button></div>
+      <div class="impact-box"><strong>O que muda?</strong><p>Você passará a acompanhar esta comunidade no painel e poderá tomar decisões considerando os recursos locais.</p></div>
+      <div class="modal-message" id="joinMessage"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-light" data-action="close-modal">Cancelar</button><button type="button" class="btn btn-primary" data-action="confirm-join">Confirmar participação</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const REGION_LABELS = { Norte: 'Norte', Sul: 'Sul', Leste: 'Leste', Oeste: 'Oeste' };
+      const DECISIONS = [
+        { id: 'protect-spring', icon: '✦', title: 'Proteger áreas de nascente', description: 'Restringir ocupação em áreas sensíveis e recuperar a vegetação.', impact: 'Aumenta a proteção hídrica e a sustentabilidade. Pode reduzir espaço disponível para novas construções nesta rodada.', impactTitle: 'Preservação hídrica' },
+        { id: 'compact-growth', icon: '▦', title: 'Compactar o crescimento urbano', description: 'Priorizar ocupação de áreas já atendidas por infraestrutura.', impact: 'Reduz a pressão sobre novas áreas e o custo de infraestrutura. Exige mais negociação entre os moradores.', impactTitle: 'Uso eficiente do solo' },
+        { id: 'green-mobility', icon: '↝', title: 'Investir em mobilidade verde', description: 'Conectar a comunidade com caminhos sombreados e transporte de baixo impacto.', impact: 'Melhora a qualidade ambiental e a integração regional. Consome parte do orçamento coletivo.', impactTitle: 'Conexão e qualidade de vida' },
+        { id: 'expand-orla-livre', icon: '≈', title: 'Expandir Orla Livre', description: 'Recuperar acesso público e recompor a vegetação na faixa de proteção.', impact: 'Protege as margens e favorece infiltração. A decisão deve ser acompanhada por uma leitura de campo da orla.', impactTitle: 'Acesso público e mata ciliar' }
+      ];
+
+      const state = { villages: [], player: null, selectedRegion: 'TODAS', selectedVillageId: null, query: '', decisions: [], pendingDecision: null, pendingJoin: null, source: 'loading' };
+      let toastTimer;
+
+      function el(id) { return document.getElementById(id); }
+      function number(value) { return Number(value) || 0; }
+      function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]; }); }
+      function formatNumber(value) { return number(value).toLocaleString('pt-BR'); }
+      function formatDate(value) { if (!value) return 'agora'; const date = new Date(value); return Number.isNaN(date.getTime()) ? 'agora' : date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+      function currentVillage() { return state.villages.find(function (village) { return village.villageId === state.selectedVillageId; }) || state.villages[0] || null; }
+      function visibleVillages() { return state.villages.filter(function (village) { const regionMatch = state.selectedRegion === 'TODAS' || village.region === state.selectedRegion; const query = state.query.trim().toLowerCase(); return regionMatch && (!query || String(village.name).toLowerCase().includes(query) || String(village.region).toLowerCase().includes(query)); }); }
+      function initials(name) { return String(name || '?').trim().split(/\s+/).slice(0, 2).map(function (part) { return part[0]; }).join('').toUpperCase() || '?'; }
+      function normalizeVillage(village) {
+        const normalized = Object.assign({}, village || {});
+        normalized.villageId = String(normalized.villageId || normalized.id || '');
+        normalized.name = String(normalized.name || normalized.region || 'Território sem nome');
+        normalized.region = String(normalized.region || 'Norte');
+        normalized.population = number(normalized.population || normalized.membersCount);
+        normalized.waterAllocation = number(normalized.waterAllocation || normalized.water || normalized.totalWater);
+        normalized.foodStock = number(normalized.foodStock || normalized.food || normalized.totalFood);
+        normalized.sustainabilityIndex = Math.max(0, Math.min(100, number(normalized.sustainabilityIndex || normalized.sustainability || normalized.score || 50)));
+        normalized.status = String(normalized.status || 'ATIVA').toUpperCase();
+        normalized.shoreline = normalized.shoreline && typeof normalized.shoreline === 'object' ? normalized.shoreline : { measured: false, status: 'SEM_MEDICAO', erosionRisk: null };
+        return normalized;
+      }
+
+      function showToast(message, type) {
+        const toast = el('toast');
+        toast.textContent = message;
+        toast.className = 'toast show' + (type === 'error' ? ' error' : '');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.className = 'toast'; }, 4200);
+      }
+
+      function setLoading(isLoading) {
+        el('dataStatus').textContent = isLoading ? 'Atualizando dados da bacia…' : (state.source === 'server' ? 'Dados sincronizados agora' : 'Dados indisponíveis');
+        if (isLoading) el('territoryGrid').innerHTML = '<div class="loading-state"><span class="spinner"></span><div>Atualizando os territórios…</div></div>';
+      }
+
+      function renderFilters() {
+        const regions = ['TODAS'].concat(Object.keys(REGION_LABELS));
+        el('regionFilters').innerHTML = regions.map(function (region) {
+          const label = region === 'TODAS' ? 'Todas as regiões' : REGION_LABELS[region];
+          return '<button type="button" role="tab" aria-selected="' + (state.selectedRegion === region) + '" class="filter-btn ' + (state.selectedRegion === region ? 'active' : '') + '" data-region="' + escapeHtml(region) + '">' + escapeHtml(label) + '</button>';
+        }).join('');
+      }
+
+      function renderSummary() {
+        const villages = visibleVillages();
+        const population = villages.reduce(function (total, village) { return total + village.population; }, 0);
+        const water = villages.reduce(function (total, village) { return total + village.waterAllocation; }, 0);
+        const sustainability = villages.length ? Math.round(villages.reduce(function (total, village) { return total + village.sustainabilityIndex; }, 0) / villages.length) : 0;
+        el('summaryGrid').innerHTML = [
+          ['Comunidades', formatNumber(villages.length), 'com dados ativos', '⌘'],
+          ['Pessoas envolvidas', formatNumber(population), 'moradores acompanhados', '◉'],
+          ['Reserva de água', formatNumber(water), 'créditos alocados', '◌'],
+          ['Sustentabilidade', sustainability + '/100', 'média da seleção', '✦']
+        ].map(function (item) { return '<div class="summary-card"><div class="label"><span>' + item[0] + '</span><span>' + item[3] + '</span></div><div class="value">' + item[1] + '</div><div class="hint">' + item[2] + '</div></div>'; }).join('');
+      }
+
+      function renderTerritories() {
+        const villages = visibleVillages();
+        if (!villages.length) {
+          el('territoryGrid').innerHTML = '<div class="empty"><strong>Nenhum território encontrado</strong><span>Experimente limpar a busca ou selecionar outra região.</span><br><button type="button" class="btn btn-light" data-action="clear-filters" style="margin-top:14px">Limpar filtros</button></div>';
+          return;
+        }
+        el('territoryGrid').innerHTML = villages.map(function (village) {
+          const mine = state.player && state.player.villageId === village.villageId;
+          const selected = state.selectedVillageId === village.villageId;
+          const status = mine ? 'Minha vila' : (village.status === 'ATIVA' ? 'Ativa' : 'Em pausa');
+          const description = village.sustainabilityIndex >= 75 ? 'Boa capacidade de preservar água e organizar o crescimento.' : village.sustainabilityIndex >= 60 ? 'Território em transição: boas práticas já estão em andamento.' : 'Atenção à pressão sobre água, solo e infraestrutura local.';
+          return '<article class="territory-card ' + (selected ? 'selected' : '') + '">' +
+            '<div class="territory-top"><div><div class="territory-region">Região ' + escapeHtml(REGION_LABELS[village.region] || village.region) + '</div><h3>' + escapeHtml(village.name) + '</h3></div><span class="status ' + (mine ? 'mine' : '') + '">' + status + '</span></div>' +
+            '<p class="territory-description">' + description + '</p>' +
+            '<div class="meter-line"><span>Índice de sustentabilidade</span><span>' + village.sustainabilityIndex + '/100</span></div><div class="meter"><i style="width:' + village.sustainabilityIndex + '%"></i></div>' +
+            '<div class="territory-stats"><div class="territory-stat"><b>' + formatNumber(village.population) + '</b><span>pessoas</span></div><div class="territory-stat"><b>' + formatNumber(village.waterAllocation) + '</b><span>água</span></div><div class="territory-stat"><b>' + formatNumber(village.foodStock) + '</b><span>alimento</span></div></div>' +
+            '<div class="card-actions"><button type="button" class="btn btn-light" data-view-village="' + escapeHtml(village.villageId) + '">Ver território</button>' + (mine ? '<button type="button" class="btn btn-primary" data-view-village="' + escapeHtml(village.villageId) + '">Gerenciar</button>' : '<button type="button" class="btn btn-primary" data-join-village="' + escapeHtml(village.villageId) + '">Participar</button>') + '</div>' +
+            '</article>';
+        }).join('');
+      }
+
+      function renderDetail() {
+        const village = currentVillage();
+        if (!village) {
+          el('detailPanel').innerHTML = '<div class="empty"><strong>Escolha um território</strong><span>Os detalhes e decisões aparecerão aqui.</span></div>';
+          el('decisionPanel').innerHTML = '';
+          return;
+        }
+        const mine = state.player && state.player.villageId === village.villageId;
+        const shoreline = village.shoreline || {};
+        const shorelineLabel = shoreline.measured ? (formatNumber(shoreline.ecologicalScore) + '/100') : 'Sem medição';
+        const risk = shoreline.measured
+          ? 'Última leitura da orla: risco ' + String(shoreline.erosionRisk || 'não classificado').toLowerCase() + '. ' + ((shoreline.recommendedActions || [])[0] || 'Compare a evidência antes de decidir.')
+          : 'A orla ainda não possui medição de campo. Registre evidências antes de classificar risco ou integridade.';
+        el('detailPanel').innerHTML = '<div class="detail-header"><div><div class="territory-region">Território selecionado · ' + escapeHtml(village.region) + '</div><h2>' + escapeHtml(village.name) + '</h2><p>' + (mine ? 'Você participa desta comunidade.' : 'Você está observando esta comunidade.') + '</p></div><div class="score"><b>' + village.sustainabilityIndex + '</b><span>índice</span></div></div>' +
+          '<div class="detail-metrics"><div class="detail-metric"><span>População</span><b>' + formatNumber(village.population) + '</b></div><div class="detail-metric"><span>Água disponível</span><b>' + formatNumber(village.waterAllocation) + '</b></div><div class="detail-metric"><span>Estoque de alimento</span><b>' + formatNumber(village.foodStock) + '</b></div><div class="detail-metric"><span>Integridade da orla</span><b>' + escapeHtml(shorelineLabel) + '</b></div></div>' +
+          '<div class="insight"><span aria-hidden="true">◈</span><div><strong>Leitura para a próxima rodada</strong>' + escapeHtml(risk) + '</div></div>' +
+          '<div class="detail-footer"><button type="button" class="btn btn-primary" data-action="open-first-decision">Avaliar uma decisão</button>' + (mine ? '<button type="button" class="btn btn-light" data-action="open-shoreline">Registrar leitura da orla</button>' : '') + '<button type="button" class="btn btn-light" data-action="toggle-history">' + (el('historyPanel').classList.contains('visible') ? 'Ocultar histórico' : 'Ver histórico') + '</button>' + (mine ? '' : '<button type="button" class="btn btn-light" data-join-village="' + escapeHtml(village.villageId) + '">Participar desta vila</button>') + '</div>';
+
+        el('decisionPanel').innerHTML = '<h3>Próximas escolhas</h3><p>Compare uma intervenção e registre a decisão da equipe para esta rodada.</p><div class="decision-list">' + DECISIONS.map(function (decision) { return '<div class="decision-item"><div class="decision-icon">' + decision.icon + '</div><div><strong>' + decision.title + '</strong><span>' + decision.description + '</span><button type="button" class="btn btn-light" data-decision="' + decision.id + '">Avaliar impacto →</button></div></div>'; }).join('') + '</div>';
+        renderHistory();
+      }
+
+      function renderHistory() {
+        const village = currentVillage();
+        const history = state.decisions.filter(function (decision) { return !village || decision.villageId === village.villageId; });
+        el('historyPanel').innerHTML = '<h3>Histórico de decisões</h3><p>Escolhas persistidas no histórico autoritativo deste jogador.</p>' + (history.length ? '<div class="history-list">' + history.slice(0, 8).map(function (decision) { return '<div class="history-row"><div><strong>' + escapeHtml(decision.title) + '</strong><span>' + formatDate(decision.createdAt) + (decision.note ? ' · ' + escapeHtml(decision.note) : '') + '</span></div><span class="sync-badge">Sincronizada</span></div>'; }).join('') + '</div>' : '<div class="empty"><strong>Nenhuma decisão registrada</strong><span>As escolhas confirmadas desta comunidade aparecerão aqui.</span></div>');
+      }
+
+      function render() {
+        const visible = visibleVillages();
+        if (!visible.some(function (village) { return village.villageId === state.selectedVillageId; })) state.selectedVillageId = visible[0] ? visible[0].villageId : (state.villages[0] && state.villages[0].villageId);
+        const playerName = state.player && (state.player.playerName || state.player.username) || 'Gestor(a)';
+        el('userName').textContent = playerName;
+        el('userAvatar').textContent = initials(playerName);
+        el('roundNumber').textContent = String(Math.max(1, state.decisions.length + 1)).padStart(2, '0');
+        el('roundDescription').textContent = state.decisions.length ? 'Você já registrou ' + state.decisions.length + ' decisão(ões). Revise os impactos antes do próximo passo.' : 'Leitura inicial das regiões e seus indicadores de sustentabilidade.';
+        renderFilters();
+        renderSummary();
+        renderTerritories();
+        renderDetail();
+      }
+
+      function openModal(id) { el(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function closeModals() { document.querySelectorAll('.modal-backdrop').forEach(function (modal) { modal.classList.remove('open'); }); document.body.style.overflow = ''; }
+
+      function openDecision(decisionId) {
+        const decision = DECISIONS.find(function (item) { return item.id === decisionId; });
+        const village = currentVillage();
+        if (!decision || !village) return;
+        state.pendingDecision = decision;
+        el('decisionModalTitle').textContent = decision.title;
+        el('decisionModalSubtitle').textContent = village.name + ' · Região ' + village.region;
+        el('decisionImpactTitle').textContent = decision.impactTitle;
+        el('decisionImpact').textContent = decision.impact;
+        el('decisionNote').value = '';
+        el('modalMessage').textContent = '';
+        openModal('decisionModal');
+      }
+
+      function openJoin(villageId) {
+        const village = state.villages.find(function (item) { return item.villageId === villageId; });
+        if (!village) return;
+        state.pendingJoin = village;
+        el('joinModalSubtitle').textContent = village.name + ' · Região ' + village.region;
+        el('joinMessage').textContent = '';
+        openModal('joinModal');
+      }
+
+      function openShoreline() {
+        const village = currentVillage();
+        const mine = village && state.player && state.player.villageId === village.villageId;
+        if (!village || !mine) return;
+        const previous = village.shoreline && village.shoreline.observation || {};
+        el('shorelineModalSubtitle').textContent = village.name + ' · faixa de proteção de 30 m';
+        el('shoreTotal').value = previous.totalShoreMeters === undefined ? '' : previous.totalShoreMeters;
+        el('shoreOccupied').value = previous.occupiedMeters === undefined ? '' : previous.occupiedMeters;
+        el('shoreForest').value = previous.riparianForestPercent === undefined ? '' : previous.riparianForestPercent;
+        el('shoreDistance').value = previous.distanceToShore === undefined ? '' : previous.distanceToShore;
+        el('shoreIntervention').value = previous.interventionType || 'PUBLIC_PARK';
+        el('shoreNote').value = '';
+        el('shorelineMessage').textContent = '';
+        document.querySelector('#shorelineModal [data-action="confirm-shoreline"]').disabled = false;
+        openModal('shorelineModal');
+      }
+
+      function requiredNumber(id, label) {
+        const raw = String(el(id).value || '').trim();
+        if (!raw) throw new Error('Informe ' + label + '.');
+        const value = Number(raw);
+        if (!Number.isFinite(value)) throw new Error(label + ' precisa ser um número.');
+        return value;
+      }
+
+      function confirmDecision() {
+        const village = currentVillage();
+        const decision = state.pendingDecision;
+        if (!village || !decision) return;
+        if (state.source !== 'server' || !state.player || !state.player.playerId || !window.API || !API.village || !API.village.recordDecision) {
+          el('modalMessage').textContent = 'A decisão não pode ser registrada sem conexão com o histórico.';
+          return;
+        }
+        const button = document.querySelector('#decisionModal [data-action="confirm-decision"]');
+        const note = el('decisionNote').value.trim();
+        button.disabled = true;
+        el('modalMessage').textContent = 'Registrando no histórico…';
+        API.village.recordDecision(state.player.playerId, village.villageId, { optionId: decision.id, title: decision.title, note: note }).then(function (result) {
+          if (!result || result.success !== true) throw new Error((result && (result.error || result.message)) || 'Não foi possível registrar.');
+          closeModals();
+          return loadData(false).then(function () { showToast('Decisão registrada no histórico da vila.'); });
+        }).catch(function (error) {
+          button.disabled = false;
+          el('modalMessage').textContent = error.message || 'Não foi possível registrar a decisão.';
+        });
+      }
+
+      function confirmShoreline() {
+        const village = currentVillage();
+        const message = el('shorelineMessage');
+        if (!village || !state.player || !state.player.playerId || !window.API || !API.village || !API.village.recordShorelineInspection) {
+          message.textContent = 'A medição não pode ser registrada sem conexão com o histórico.';
+          return;
+        }
+        let observation;
+        try {
+          observation = {
+            totalShoreMeters: requiredNumber('shoreTotal', 'a extensão observada'),
+            occupiedMeters: requiredNumber('shoreOccupied', 'o trecho ocupado'),
+            riparianForestPercent: requiredNumber('shoreForest', 'a cobertura de mata ciliar'),
+            distanceToShore: requiredNumber('shoreDistance', 'a distância até a água'),
+            interventionType: el('shoreIntervention').value,
+            note: el('shoreNote').value.trim()
+          };
+          if (observation.occupiedMeters > observation.totalShoreMeters) throw new Error('O trecho ocupado não pode superar a extensão observada.');
+        } catch (error) {
+          message.textContent = error.message;
+          return;
+        }
+
+        const button = document.querySelector('#shorelineModal [data-action="confirm-shoreline"]');
+        button.disabled = true;
+        message.textContent = 'Validando e registrando a evidência…';
+        API.village.recordShorelineInspection(state.player.playerId, village.villageId, observation).then(function (result) {
+          if (!result || result.success !== true) throw new Error((result && (result.error || result.message)) || 'Não foi possível registrar a medição.');
+          closeModals();
+          return loadData(false).then(function () { showToast('Leitura da orla registrada com avaliação do servidor.'); });
+        }).catch(function (error) {
+          button.disabled = false;
+          message.textContent = error.message || 'Não foi possível registrar a medição.';
+        });
+      }
+
+      function confirmJoin() {
+        const village = state.pendingJoin;
+        if (!village) return;
+        const button = document.querySelector('#joinModal [data-action="confirm-join"]');
+        button.disabled = true;
+        el('joinMessage').textContent = 'Atualizando sua participação…';
+        if (state.source === 'server' && state.player && state.player.playerId && window.API && API.village && API.village.join) {
+          API.village.join(state.player.playerId, village.villageId).then(function (result) {
+            if (!result || result.success !== true) throw new Error((result && (result.error || result.message)) || 'Não foi possível entrar nesta vila.');
+            state.player.villageId = village.villageId;
+            closeModals();
+            render();
+            showToast('Você agora participa de ' + village.name + '.');
+          }).catch(function (error) { button.disabled = false; el('joinMessage').textContent = error.message || 'Não foi possível concluir a participação.'; });
+        } else {
+          button.disabled = false;
+          el('joinMessage').textContent = 'A participação exige conexão com o servidor.';
+        }
+      }
+
+      function exportSummary() {
+        const village = currentVillage();
+        const lines = ['PARANOÁ VIVO — SÍNTESE TERRITORIAL', 'Bacia do Paranoá · Distrito Federal', 'Gerado em: ' + new Date().toLocaleString('pt-BR'), ''];
+        if (village) {
+          const shoreline = village.shoreline || {};
+          lines.push('Território em foco: ' + village.name + ' (' + village.region + ')', 'Sustentabilidade: ' + village.sustainabilityIndex + '/100', 'População: ' + village.population, 'Água alocada: ' + village.waterAllocation, 'Alimento em estoque: ' + village.foodStock, 'Orla: ' + (shoreline.measured ? (shoreline.ecologicalScore + '/100 · risco ' + shoreline.erosionRisk) : 'sem medição de campo'), '');
+        }
+        lines.push('Decisões registradas:');
+        state.decisions.slice(0, 10).forEach(function (decision) { lines.push('- ' + decision.title + ' · ' + formatDate(decision.createdAt) + (decision.note ? ' · ' + decision.note : '')); });
+        const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a'); link.href = url; link.download = 'sintese-paranoa.txt'; link.click(); URL.revokeObjectURL(url);
+        showToast('Síntese exportada para o seu dispositivo.');
+      }
+
+      function clearFilters() { state.selectedRegion = 'TODAS'; state.query = ''; el('territorySearch').value = ''; render(); }
+
+      function loadData(showLoading) {
+        if (showLoading) setLoading(true);
+        if (!window.API || !API.village || !API.village.getManagementData) {
+          state.villages = []; state.decisions = []; state.source = 'error'; render(); setLoading(false); showToast('A comunicação com o servidor não está disponível.', 'error'); return Promise.resolve(false);
+        }
+        return API.village.getManagementData().then(function (result) {
+          if (!result || result.success !== true || !result.data) throw new Error((result && (result.error || result.message)) || 'Resposta vazia.');
+          state.player = result.data.player || null;
+          state.villages = (result.data.villages || []).map(normalizeVillage);
+          state.decisions = Array.isArray(result.data.decisions) ? result.data.decisions : [];
+          state.source = 'server';
+          render();
+          setLoading(false);
+          return true;
+        }).catch(function (error) {
+          state.villages = [];
+          state.decisions = [];
+          state.source = 'error';
+          render();
+          setLoading(false);
+          showToast(error.message || 'Não foi possível sincronizar os territórios.', 'error');
+          return false;
+        });
+      }
+
+      function handleClick(event) {
+        const regionButton = event.target.closest('[data-region]');
+        if (regionButton) { state.selectedRegion = regionButton.getAttribute('data-region'); render(); return; }
+        const viewButton = event.target.closest('[data-view-village]');
+        if (viewButton) { state.selectedVillageId = viewButton.getAttribute('data-view-village'); render(); return; }
+        const joinButton = event.target.closest('[data-join-village]');
+        if (joinButton) { openJoin(joinButton.getAttribute('data-join-village')); return; }
+        const decisionButton = event.target.closest('[data-decision]');
+        if (decisionButton) { openDecision(decisionButton.getAttribute('data-decision')); return; }
+        const action = event.target.closest('[data-action]');
+        if (!action) return;
+        const name = action.getAttribute('data-action');
+        if (name === 'refresh') { loadData(true).then(function (success) { if (success) showToast('Dados atualizados.'); }); }
+        if (name === 'export') exportSummary();
+        if (name === 'clear-filters') clearFilters();
+        if (name === 'close-modal') closeModals();
+        if (name === 'confirm-decision') confirmDecision();
+        if (name === 'open-shoreline') openShoreline();
+        if (name === 'confirm-shoreline') confirmShoreline();
+        if (name === 'confirm-join') confirmJoin();
+        if (name === 'open-first-decision') openDecision(DECISIONS[0].id);
+        if (name === 'toggle-history') { const shouldShow = !el('historyPanel').classList.contains('visible'); el('historyPanel').classList.toggle('visible', shouldShow); renderDetail(); }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', handleClick);
+        document.addEventListener('click', function (event) { if (event.target.classList.contains('modal-backdrop')) closeModals(); });
+        document.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeModals(); });
+        el('territorySearch').addEventListener('input', function (event) { state.query = event.target.value; render(); });
+        loadData(true);
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventos do Jogo - Lago Paranoá</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      padding: 2rem;
+    }
+    
+    .events-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+      color: #e65100;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+      color: #5d4037;
+      font-size: 1.1rem;
+    }
+    
+    .filter-bar {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    
+    .filter-btn {
+      padding: 0.6rem 1.2rem;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+    
+    .filter-btn:hover {
+      border-color: #e65100;
+      color: #e65100;
+    }
+    
+    .filter-btn.active {
+      background: #e65100;
+      color: white;
+      border-color: #e65100;
+    }
+    
+    .events-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .event-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      border-left: 5px solid;
+      animation: slideIn 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .event-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: rgba(0,0,0,0.03);
+      border-radius: 50%;
+      transform: translate(30%, -30%);
+    }
+    
+    .event-card.positive {
+      border-left-color: #4caf50;
+    }
+    
+    .event-card.negative {
+      border-left-color: #f44336;
+    }
+    
+    .event-card.neutral {
+      border-left-color: #2196f3;
+    }
+    
+    .event-card.warning {
+      border-left-color: #ff9800;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .event-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .event-title {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    
+    .event-icon {
+      font-size: 2rem;
+    }
+    
+    .event-title h3 {
+      color: #212121;
+      font-size: 1.3rem;
+    }
+    
+    .event-date {
+      color: #757575;
+      font-size: 0.85rem;
+    }
+    
+    .event-description {
+      color: #424242;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+    
+    .event-impact {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+    
+    .impact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .impact-value {
+      font-weight: bold;
+    }
+    
+    .impact-value.positive {
+      color: #4caf50;
+    }
+    
+    .impact-value.negative {
+      color: #f44336;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #757575;
+    }
+    
+    .loading::after {
+      content: "...";
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    
+    @keyframes dots {
+      0%, 20% { content: "."; }
+      40% { content: ".."; }
+      60%, 100% { content: "..."; }
+    }
+    
+    .no-events {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      color: #757575;
+    }
+    
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .back-link a {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #e65100;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .back-link a:hover {
+      background: #f57c00;
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="events-container">
+    <div class="page-header">
+      <h1>🎲 Eventos do Jogo</h1>
+      <p>Acompanhe eventos aleatórios que afetam a Bacia do Paranoá</p>
+    </div>
+    
+    <div class="filter-bar">
+      <span style="font-weight: 600; color: #757575;">Filtrar:</span>
+      <button class="filter-btn active" data-filter="all">Todos</button>
+      <button class="filter-btn" data-filter="positive">✅ Positivos</button>
+      <button class="filter-btn" data-filter="negative">❌ Negativos</button>
+      <button class="filter-btn" data-filter="neutral">ℹ️ Informativos</button>
+      <button class="filter-btn" data-filter="warning">⚠️ Alertas</button>
+    </div>
+    
+    <div id="events-feed" class="events-feed">
+      <div class="loading">Carregando eventos</div>
+    </div>
+    
+    <div class="back-link">
+      <a href="?page=dashboard">← Voltar ao Dashboard</a>
+    </div>
+  </div>
+
+  <?!= include('ApiClient') ?>
+  <script>
+    let gameEvents = [];
+
+    function eventPresentation(eventType) {
+      const type = String(eventType || 'INFO').toUpperCase();
+      if (/CRISIS|NEGATIVE|DROUGHT|FIRE/.test(type)) return { type: 'negative', icon: '⚠️' };
+      if (/WARNING|ALERT/.test(type)) return { type: 'warning', icon: '🔔' };
+      if (/POSITIVE|RAIN|RECOVERY|SUCCESS/.test(type)) return { type: 'positive', icon: '✅' };
+      return { type: 'neutral', icon: 'ℹ️' };
+    }
+
+    function appendText(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      element.textContent = text || '';
+      parent.appendChild(element);
+      return element;
+    }
+
+    function showEventsState(message) {
+      const feed = document.getElementById('events-feed');
+      feed.replaceChildren();
+      appendText(feed, 'div', message, 'no-events');
+    }
+
+    function renderEvents(filter = 'all') {
+      const feed = document.getElementById('events-feed');
+      const filtered = gameEvents.filter(event => {
+        return filter === 'all' || eventPresentation(event.eventType).type === filter;
+      });
+      feed.replaceChildren();
+      if (!filtered.length) {
+        showEventsState('Nenhum evento real registrado para este filtro.');
+        return;
+      }
+
+      filtered.forEach(event => {
+        const presentation = eventPresentation(event.eventType);
+        const card = document.createElement('article');
+        card.className = 'event-card ' + presentation.type;
+        const header = document.createElement('div');
+        header.className = 'event-header';
+        const title = document.createElement('div');
+        title.className = 'event-title';
+        appendText(title, 'span', presentation.icon, 'event-icon');
+        appendText(title, 'h3', event.title || 'Evento da rodada');
+        header.appendChild(title);
+        appendText(header, 'span', formatDate(event.createdAt), 'event-date');
+        card.appendChild(header);
+        appendText(card, 'p', event.description || 'Sem descrição registrada.', 'event-description');
+        if (event.impact) {
+          const impact = document.createElement('div');
+          impact.className = 'event-impact';
+          appendText(impact, 'span', String(event.impact), 'impact-value ' + presentation.type);
+          card.appendChild(impact);
+        }
+        feed.appendChild(card);
+      });
+    }
+
+    function formatDate(value) {
+      if (!value) return 'Data não registrada';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleDateString('pt-BR');
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        renderEvents(this.getAttribute('data-filter'));
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      API.history.events(50)
+        .then(result => {
+          if (!result || result.success !== true) throw new Error((result && result.error) || 'Falha ao carregar eventos.');
+          gameEvents = (result.data && result.data.events) || [];
+          renderEvents('all');
+        })
+        .catch(error => showEventsState(error.message || 'Erro ao carregar eventos.'));
+    });
+  </script>
+</body>
+</html>

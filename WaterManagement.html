@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Planejamento de créditos de água na Bacia do Paranoá">
+  <title>Planejar água · Lago Paranoá</title>
+  <style>
+    :root {
+      --ink: #173b36; --muted: #617873; --line: #d7e7e2; --canvas: #f2f8f6;
+      --surface: #fff; --teal: #0b7469; --teal-dark: #07534c; --mint: #dff3ec;
+      --gold: #c88c2f; --danger: #b94a3e; --shadow: 0 18px 48px rgba(18, 67, 59, .1);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: radial-gradient(circle at 90% 0, #d9eee8 0, transparent 30rem), var(--canvas); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    button, input { font: inherit; } button { cursor: pointer; } a { color: inherit; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 238px minmax(0, 1fr); }
+    .sidebar { position: sticky; top: 0; height: 100vh; padding: 25px 17px; color: #e8f7f2; background: linear-gradient(180deg, #0a5049, #153b38); }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 9px 29px; }
+    .brand-mark { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 13px; color: #09564e; background: #dff4ed; font-size: 21px; }
+    .brand strong, .brand span { display: block; } .brand strong { font-size: 14px; } .brand span { margin-top: 3px; color: #a9d0c6; font-size: 11px; }
+    .nav-label { padding: 0 10px 9px; color: #90beb4; text-transform: uppercase; letter-spacing: .13em; font-size: 10px; font-weight: 800; }
+    nav { display: grid; gap: 5px; }
+    .nav-link { display: flex; gap: 10px; align-items: center; padding: 11px 12px; border-radius: 11px; color: #c4dfd8; text-decoration: none; font-size: 13px; font-weight: 700; }
+    .nav-link:hover, .nav-link.active { color: #fff; background: rgba(255,255,255,.12); }
+    .sidebar-note { margin-top: 36px; padding: 15px; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; background: rgba(255,255,255,.06); }
+    .sidebar-note strong { font-size: 12px; } .sidebar-note p { margin: 6px 0 0; color: #b8d7cf; font-size: 11px; line-height: 1.55; }
+    .page { min-width: 0; padding: 25px clamp(18px, 4vw, 52px) 48px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; max-width: 1240px; margin: 0 auto 28px; }
+    .breadcrumb { color: var(--muted); font-size: 12px; } .breadcrumb strong { color: var(--ink); }
+    .btn { border: 0; border-radius: 11px; padding: 11px 15px; font-weight: 800; transition: transform .15s ease, background .15s ease; }
+    .btn:hover { transform: translateY(-1px); } .btn-primary { color: #fff; background: var(--teal); } .btn-primary:hover { background: var(--teal-dark); }
+    .btn-light { border: 1px solid var(--line); color: var(--ink); background: rgba(255,255,255,.78); text-decoration: none; } .btn:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+    .content { max-width: 1240px; margin: 0 auto; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; margin-bottom: 20px; }
+    .hero-copy { position: relative; overflow: hidden; padding: clamp(25px, 4vw, 43px); border-radius: 23px; color: #eefaf6; background: linear-gradient(120deg, #0a5c53, #128677); box-shadow: var(--shadow); }
+    .hero-copy::after { content: ""; position: absolute; right: -60px; bottom: -110px; width: 260px; height: 260px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; box-shadow: 0 0 0 29px rgba(255,255,255,.05), 0 0 0 58px rgba(255,255,255,.035); }
+    .eyebrow { position: relative; z-index: 1; margin: 0 0 10px; color: #afe0d3; text-transform: uppercase; letter-spacing: .15em; font-size: 10px; font-weight: 850; }
+    h1 { position: relative; z-index: 1; max-width: 720px; margin: 0 0 12px; font-size: clamp(32px, 4.8vw, 54px); line-height: 1.02; letter-spacing: -.045em; }
+    .hero-copy > p:last-child { position: relative; z-index: 1; max-width: 690px; margin: 0; color: #d9f0e9; font-size: 14px; line-height: 1.7; }
+    .status-card { display: flex; flex-direction: column; justify-content: space-between; padding: 24px; border: 1px solid var(--line); border-radius: 23px; background: var(--surface); box-shadow: var(--shadow); }
+    .status-label { color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: 10px; font-weight: 850; }
+    .status-value { margin: 11px 0 4px; font-size: 31px; font-weight: 900; letter-spacing: -.04em; }
+    .status-pill { align-self: flex-start; padding: 6px 10px; border-radius: 99px; color: #28745c; background: #e4f4ea; font-size: 10px; font-weight: 900; }
+    .status-pill.warning { color: #8d621c; background: #fff1d6; } .status-pill.critical { color: #9b392f; background: #fbe5e1; }
+    .sync-line { padding-top: 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .metric { padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.82); }
+    .metric span { display: block; color: var(--muted); font-size: 11px; font-weight: 750; } .metric strong { display: block; margin: 8px 0 3px; font-size: 25px; letter-spacing: -.035em; } .metric small { color: #789089; font-size: 10px; }
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); gap: 18px; align-items: start; }
+    .panel { padding: 23px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface); box-shadow: 0 8px 28px rgba(18,67,59,.055); }
+    .panel-header { display: flex; justify-content: space-between; gap: 14px; align-items: start; margin-bottom: 19px; }
+    .panel h2 { margin: 0 0 5px; font-size: 20px; letter-spacing: -.025em; } .panel-header p, .panel > p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .trend { padding: 6px 9px; border-radius: 9px; color: var(--teal); background: var(--mint); font-size: 11px; font-weight: 850; white-space: nowrap; } .trend.down { color: var(--danger); background: #fbe8e4; }
+    .history-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { padding: 10px 8px; color: var(--muted); text-align: left; text-transform: uppercase; letter-spacing: .08em; font-size: 9px; } td { padding: 12px 8px; border-top: 1px solid #e8f0ed; } td strong { color: var(--teal-dark); }
+    .empty { padding: 26px; border: 1px dashed #bad2cb; border-radius: 13px; color: var(--muted); text-align: center; font-size: 12px; }
+    .decision-copy { margin-bottom: 18px; padding: 14px; border-radius: 13px; background: #f3f8f6; } .decision-copy strong { display: block; margin-bottom: 5px; font-size: 12px; } .decision-copy p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .presets { display: flex; gap: 7px; margin: 15px 0; } .preset { flex: 1; padding: 9px; border: 1px solid var(--line); border-radius: 9px; color: var(--teal-dark); background: #fff; font-weight: 800; }
+    label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; } input { width: 100%; padding: 12px 13px; border: 1px solid #bdd2cc; border-radius: 10px; outline: none; color: var(--ink); background: #fff; }
+    input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11,116,105,.12); }
+    .cost { display: flex; justify-content: space-between; gap: 12px; margin: 13px 0 16px; padding: 13px; border-radius: 11px; color: var(--muted); background: #f5f8f7; font-size: 12px; } .cost strong { color: var(--ink); }
+    .form-actions { display: flex; gap: 9px; } .form-actions .btn-primary { flex: 1; } .message { min-height: 20px; margin-top: 12px; color: var(--teal-dark); font-size: 12px; font-weight: 700; } .message.error { color: var(--danger); }
+    .loading { opacity: .58; pointer-events: none; }
+    @media (max-width: 980px) { .shell { grid-template-columns: 1fr; } .sidebar { position: static; width: 100%; height: auto; } nav { grid-template-columns: repeat(4, minmax(0, 1fr)); } .sidebar-note, .nav-label { display: none; } .brand { padding-bottom: 18px; } .workspace { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .page { padding: 16px 13px 34px; } .topbar { align-items: stretch; flex-direction: column; } .hero { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } nav { grid-template-columns: 1fr 1fr; } .nav-link { font-size: 11px; } .panel { padding: 18px; } }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="waterApp">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="brand"><div class="brand-mark">◌</div><div><strong>Paranoá vivo</strong><span>gestão hídrica</span></div></div>
+      <div class="nav-label">Navegação</div>
+      <nav><a class="nav-link" href="?page=dashboard">⌂ Visão geral</a><a class="nav-link" href="?page=aquifer">≈ Observatório</a><a class="nav-link active" href="?page=water" aria-current="page">◌ Planejar água</a><a class="nav-link" href="?page=crops">♧ Culturas</a></nav>
+      <div class="sidebar-note"><strong>Decisão, não recompensa</strong><p>Créditos de água são recursos do jogo. Pontos de experiência continuam separados da disponibilidade hídrica.</p></div>
+    </aside>
+    <main class="page">
+      <div class="topbar"><div class="breadcrumb">Bacia do Paranoá / <strong>Planejamento da água</strong></div><button class="btn btn-light" type="button" data-action="refresh">↻ Atualizar</button></div>
+      <div class="content">
+        <section class="hero" aria-labelledby="pageTitle">
+          <div class="hero-copy"><p class="eyebrow">Decisão baseada no balanço da bacia</p><h1 id="pageTitle">Use água sem perder de vista o coletivo.</h1><p>Compare seu saldo, o custo de reposição e a tendência do aquífero antes de confirmar uma compra. A transação usa dados reais da sua sessão e da planilha.</p></div>
+          <aside class="status-card" aria-live="polite"><div><div class="status-label">Aquífero compartilhado</div><div class="status-value" id="aquiferLevel">—</div><span class="status-pill" id="aquiferStatus">Carregando</span></div><div class="sync-line" id="syncStatus">Conectando aos dados…</div></aside>
+        </section>
+        <section class="metrics" aria-label="Indicadores de gestão hídrica">
+          <article class="metric"><span>Seus créditos</span><strong id="waterCredits">—</strong><small>saldo disponível</small></article>
+          <article class="metric"><span>Alimento disponível</span><strong id="foodUnits">—</strong><small>moeda da aquisição</small></article>
+          <article class="metric"><span>Recarga recente</span><strong id="rechargeValue">—</strong><small>m³ na última medição</small></article>
+          <article class="metric"><span>Extração recente</span><strong id="extractionValue">—</strong><small>m³ na última medição</small></article>
+        </section>
+        <div class="workspace">
+          <section class="panel" aria-labelledby="historyTitle">
+            <div class="panel-header"><div><h2 id="historyTitle">Leitura antes da decisão</h2><p>As medições mais recentes mostram se a retirada está sendo compensada pela recarga.</p></div><span class="trend" id="trendLabel">Sem tendência</span></div>
+            <div class="history-wrap"><table><thead><tr><th>Rodada</th><th>Nível</th><th>Recarga</th><th>Extração</th><th>Situação</th></tr></thead><tbody id="historyRows"><tr><td colspan="5"><div class="empty">Carregando histórico hídrico…</div></td></tr></tbody></table></div>
+          </section>
+          <section class="panel" aria-labelledby="purchaseTitle">
+            <div class="panel-header"><div><h2 id="purchaseTitle">Planejar reposição</h2><p>Compre somente o necessário para a próxima ação.</p></div></div>
+            <div class="decision-copy"><strong>Pergunta para a equipe</strong><p>Esta compra responde a uma necessidade planejada ou apenas transfere a pressão para o estoque coletivo?</p></div>
+            <form id="purchaseForm">
+              <label for="waterAmount">Quantidade de créditos</label><input id="waterAmount" name="waterAmount" type="number" min="1" step="1" inputmode="numeric" required aria-describedby="purchaseLimit">
+              <div class="presets" aria-label="Quantidades sugeridas"><button class="preset" type="button" data-amount="25">25</button><button class="preset" type="button" data-amount="50">50</button><button class="preset" type="button" data-amount="100">100</button></div>
+              <div class="cost"><span>Custo estimado</span><strong id="estimatedCost">0 alimento</strong></div><p id="purchaseLimit">Limite disponível: —</p>
+              <div class="form-actions"><a class="btn btn-light" href="?page=aquifer">Ver aquífero</a><button class="btn btn-primary" id="purchaseButton" type="submit">Confirmar compra</button></div>
+              <div class="message" id="formMessage" role="status" aria-live="polite"></div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function () {
+      'use strict';
+      const state = { player: null, aquifer: null, history: [], unitPrice: .5, maxPurchasable: 0, busy: false };
+      function byId(id) { return document.getElementById(id); }
+      function number(value) { const parsed = Number(value); return Number.isFinite(parsed) ? parsed : 0; }
+      function format(value, digits) { return number(value).toLocaleString('pt-BR', { maximumFractionDigits: digits == null ? 1 : digits }); }
+      function escapeHtml(value) { return String(value == null ? '' : value).replace(/[&<>'"]/g, function (char) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]; }); }
+      function statusClass(status) { const value = String(status || '').toUpperCase(); return value === 'CRÍTICO' || value === 'ERRO' ? 'critical' : value === 'ALERTA' ? 'warning' : ''; }
+      function setBusy(busy) { state.busy = busy; byId('waterApp').classList.toggle('loading', busy); byId('purchaseButton').disabled = busy || state.maxPurchasable < 1; }
+      function setMessage(message, error) { const target = byId('formMessage'); target.textContent = message || ''; target.className = 'message' + (error ? ' error' : ''); }
+      function renderHistory() {
+        const rows = state.history.slice(0, 8);
+        if (!rows.length) { byId('historyRows').innerHTML = '<tr><td colspan="5"><div class="empty">Ainda não há medições para comparar.</div></td></tr>'; return; }
+        byId('historyRows').innerHTML = rows.map(function (item) { return '<tr><td>' + escapeHtml(item.round == null ? '—' : item.round) + '</td><td><strong>' + format(item.depth) + ' m³</strong></td><td>' + format(item.recharge) + '</td><td>' + format(item.extraction) + '</td><td>' + escapeHtml(item.status || 'SEM DADOS') + '</td></tr>'; }).join('');
+      }
+      function render() {
+        const player = state.player || {}; const aquifer = state.aquifer || {}; const status = String(aquifer.status || 'SEM DADOS').toUpperCase();
+        byId('waterCredits').textContent = format(player.waterCredits, 0); byId('foodUnits').textContent = format(player.foodUnits, 0);
+        byId('rechargeValue').textContent = format(aquifer.recharge, 0); byId('extractionValue').textContent = format(aquifer.extraction, 0);
+        byId('aquiferLevel').textContent = aquifer.depth == null ? 'Sem medição' : format(aquifer.depth, 0) + ' m³';
+        byId('aquiferStatus').textContent = status; byId('aquiferStatus').className = 'status-pill ' + statusClass(status);
+        byId('purchaseLimit').textContent = 'Limite pelo saldo de alimento: ' + format(state.maxPurchasable, 0) + ' créditos · preço unitário ' + format(state.unitPrice, 2); byId('waterAmount').max = String(state.maxPurchasable);
+        const previous = state.history[1]; const delta = previous && aquifer.depth != null ? number(aquifer.depth) - number(previous.depth) : 0;
+        byId('trendLabel').textContent = previous ? (delta >= 0 ? '↑ +' : '↓ ') + format(delta, 0) + ' m³' : 'Sem tendência'; byId('trendLabel').className = 'trend' + (delta < 0 ? ' down' : ''); renderHistory(); updateCost();
+      }
+      function updateCost() { const amount = Math.max(0, Math.floor(number(byId('waterAmount').value))); byId('estimatedCost').textContent = format(amount * state.unitPrice, 2) + ' alimento'; byId('purchaseButton').disabled = state.busy || amount < 1 || amount > state.maxPurchasable; }
+      async function loadData(announce) {
+        setBusy(true); setMessage('', false); byId('syncStatus').textContent = 'Atualizando dados…';
+        try {
+          const result = await API.water.getOverview(); const data = API.unwrap(result);
+          state.player = data.player || {}; state.aquifer = data.aquifer || {}; state.history = Array.isArray(data.history) ? data.history : [];
+          state.unitPrice = number(data.market && data.market.unitPrice) || .5; state.maxPurchasable = Math.max(0, Math.floor(number(data.market && data.market.maxPurchasable)));
+          render(); byId('syncStatus').textContent = 'Dados sincronizados agora'; if (announce) setMessage('Indicadores atualizados.', false);
+        } catch (error) { byId('syncStatus').textContent = 'Dados indisponíveis'; setMessage(error.message || 'Não foi possível carregar a gestão hídrica.', true); state.maxPurchasable = 0; }
+        finally { setBusy(false); updateCost(); }
+      }
+      async function purchase(event) {
+        event.preventDefault(); const amount = Math.floor(number(byId('waterAmount').value));
+        if (amount < 1 || amount > state.maxPurchasable) { setMessage('Informe uma quantidade dentro do limite disponível.', true); return; }
+        setBusy(true); setMessage('Registrando a compra…', false);
+        try { const result = await API.water.purchase(amount); API.unwrap(result); await loadData(false); byId('waterAmount').value = ''; updateCost(); setMessage(result.message || 'Compra registrada e saldos atualizados.', false); }
+        catch (error) { setMessage(error.message || 'Não foi possível concluir a compra.', true); } finally { setBusy(false); updateCost(); }
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelector('[data-action="refresh"]').addEventListener('click', function () { loadData(true); });
+        document.querySelectorAll('[data-amount]').forEach(function (button) { button.addEventListener('click', function () { byId('waterAmount').value = button.dataset.amount; updateCost(); byId('waterAmount').focus(); }); });
+        byId('waterAmount').addEventListener('input', updateCost); byId('purchaseForm').addEventListener('submit', purchase); loadData(false);
+      });
+    })();
+  </script>
+</body>
+</html>

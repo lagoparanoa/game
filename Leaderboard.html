@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking - Lago Paranoá</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      padding: 2rem;
+    }
+    
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .back-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: white;
+      color: #004d40;
+    }
+    
+    .content {
+      padding: 2rem;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .tab {
+      padding: 1rem 2rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #666;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      color: #004d40;
+      border-bottom-color: #004d40;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .user-rank {
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      border-left: 4px solid #ff9800;
+    }
+    
+    .user-rank h3 {
+      color: #e65100;
+      margin-bottom: 0.5rem;
+    }
+    
+    .user-rank-details {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .user-rank-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    
+    .leaderboard-table thead {
+      background: #f5f5f5;
+    }
+    
+    .leaderboard-table th {
+      padding: 1rem;
+      text-align: left;
+      color: #004d40;
+      font-weight: bold;
+      border-bottom: 2px solid #004d40;
+    }
+    
+    .leaderboard-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .leaderboard-table tr:hover {
+      background: #f9f9f9;
+    }
+    
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+    .rank-1 {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      color: #f57f17;
+    }
+    
+    .rank-2 {
+      background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+      color: #616161;
+    }
+    
+    .rank-3 {
+      background: linear-gradient(135deg, #cd7f32 0%, #dda15e 100%);
+      color: #5d4037;
+    }
+    
+    .rank-other {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .score-bar {
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.25rem;
+    }
+    
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+      transition: width 0.5s ease;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #004d40;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .tabs {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .tab {
+        text-align: left;
+      }
+      
+      .leaderboard-table {
+        font-size: 0.9rem;
+      }
+      
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 0.75rem 0.5rem;
+      }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏆 Ranking - Lago Paranoá</h1>
+      <p>Veja os melhores jogadores e vilas mais sustentáveis</p>
+      <a href="?page=dashboard" class="back-btn">← Voltar ao Dashboard</a>
+    </div>
+    
+    <div class="content">
+      <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando rankings...</p>
+      </div>
+      
+      <div id="content" style="display: none;">
+        <!-- User Rank -->
+        <div id="userRankSection" class="user-rank" style="display: none;">
+          <h3>📊 Sua Posição</h3>
+          <div class="user-rank-details">
+            <div class="user-rank-item">
+              <strong>Ranking:</strong>
+              <span id="userRankPosition">-</span>
+            </div>
+            <div class="user-rank-item">
+              <strong>Pontuação:</strong>
+              <span id="userScore">0</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('players')">
+            👤 Jogadores
+          </button>
+          <button class="tab" onclick="switchTab('villages')">
+            🏘️ Vilas
+          </button>
+        </div>
+        
+        <!-- Players Tab -->
+        <div id="playersTab" class="tab-content active">
+          <h2 style="color: #004d40; margin-bottom: 1rem;">Top 10 Jogadores</h2>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Jogador</th>
+                <th>Vila</th>
+                <th>Pontuação Total</th>
+                <th>Sustentabilidade</th>
+              </tr>
+            </thead>
+            <tbody id="playersTableBody">
+              <!-- Players will be loaded here -->
+            </tbody>
+          </table>
+          <div id="playersEmpty" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">🏆</div>
+            <p>Ainda não há jogadores no ranking</p>
+            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Seja o primeiro a pontuar!</p>
+          </div>
+        </div>
+        
+        <!-- Villages Tab -->
+        <div id="villagesTab" class="tab-content">
+          <h2 style="color: #004d40; margin-bottom: 1rem;">Top 5 Vilas</h2>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Vila</th>
+                <th>Região</th>
+                <th>Membros</th>
+                <th>Índice de Sustentabilidade</th>
+              </tr>
+            </thead>
+            <tbody id="villagesTableBody">
+              <!-- Villages will be loaded here -->
+            </tbody>
+          </table>
+          <div id="villagesEmpty" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">🏘️</div>
+            <p>Ainda não há vilas no ranking</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+  <?!= include('UIComponents'); ?>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      loadLeaderboards();
+    });
+    
+    function loadLeaderboards() {
+      API.leaderboards.list()
+        .then(onLeaderboardsLoaded)
+        .catch(onError);
+    }
+    
+    function onLeaderboardsLoaded(result) {
+      if (!result.success) {
+        alert('Erro ao carregar rankings: ' + (result.error || 'Desconhecido'));
+        return;
+      }
+      
+      const data = result.data;
+      
+      // Renderizar ranking do usuário
+      if (data.userRank) {
+        document.getElementById('userRankSection').style.display = 'block';
+        document.getElementById('userRankPosition').textContent = '#' + data.userRank.rank;
+        document.getElementById('userScore').textContent = data.userRank.totalScore || 0;
+      }
+      
+      // Renderizar jogadores
+      const playersBody = document.getElementById('playersTableBody');
+      if (data.topPlayers && data.topPlayers.length > 0) {
+        playersBody.innerHTML = data.topPlayers.map(player => renderPlayerRow(player)).join('');
+      } else {
+        document.getElementById('playersEmpty').style.display = 'block';
+      }
+      
+      // Renderizar vilas
+      const villagesBody = document.getElementById('villagesTableBody');
+      if (data.topVillages && data.topVillages.length > 0) {
+        villagesBody.innerHTML = data.topVillages.map(village => renderVillageRow(village)).join('');
+      } else {
+        document.getElementById('villagesEmpty').style.display = 'block';
+      }
+      
+      // Mostrar conteúdo
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function renderPlayerRow(player) {
+      const rankClass = player.rank <= 3 ? `rank-${player.rank}` : 'rank-other';
+      const trophy = player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : '';
+      
+      return `
+        <tr>
+          <td>
+            <div class="rank-badge ${rankClass}">
+              ${trophy || player.rank}
+            </div>
+          </td>
+          <td><strong>${player.playerName || 'Jogador'}</strong></td>
+          <td>${player.villageId || 'Sem vila'}</td>
+          <td>
+            <strong>${player.totalScore || 0}</strong>
+            <div class="score-bar">
+              <div class="score-fill" style="width: ${Math.min(100, (player.totalScore || 0) / 10)}%"></div>
+            </div>
+          </td>
+          <td>
+            <strong>${player.sustainabilityScore || 50}/100</strong>
+          </td>
+        </tr>
+      `;
+    }
+    
+    function renderVillageRow(village) {
+      const rankClass = village.rank <= 3 ? `rank-${village.rank}` : 'rank-other';
+      const trophy = village.rank === 1 ? '🥇' : village.rank === 2 ? '🥈' : village.rank === 3 ? '🥉' : '';
+      
+      return `
+        <tr>
+          <td>
+            <div class="rank-badge ${rankClass}">
+              ${trophy || village.rank}
+            </div>
+          </td>
+          <td><strong>${village.name || 'Vila'}</strong></td>
+          <td>${village.region || '-'}</td>
+          <td>${village.population || 0}</td>
+          <td>
+            <strong>${village.sustainabilityIndex || 50}/100</strong>
+            <div class="score-bar">
+              <div class="score-fill" style="width: ${village.sustainabilityIndex || 50}%"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    
+    function switchTab(tab) {
+      // Atualizar botões
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Atualizar conteúdo
+      document.getElementById('playersTab').classList.remove('active');
+      document.getElementById('villagesTab').classList.remove('active');
+      
+      if (tab === 'players') {
+        document.getElementById('playersTab').classList.add('active');
+      } else {
+        document.getElementById('villagesTab').classList.add('active');
+      }
+    }
+    
+    function onError(error) {
+      alert('Erro: ' + (error.message || 'Desconhecido'));
+      document.getElementById('loading').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

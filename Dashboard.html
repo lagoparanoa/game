@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Lago Paranoá</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    
+    .dashboard-header {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      padding: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .dashboard-header h1 {
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .logout-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .logout-btn:hover {
+      background: white;
+      color: #004d40;
+    }
+    
+    .dashboard-content {
+      padding: 2rem;
+    }
+    
+    .welcome-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #e8f5e9;
+      border-radius: 10px;
+      border-left: 4px solid #4caf50;
+    }
+    
+    .welcome-section h2 {
+      color: #2e7d32;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      border-color: #004d40;
+    }
+    
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .stat-icon {
+      font-size: 2rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #004d40;
+    }
+    
+    .stat-description {
+      font-size: 0.85rem;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+    
+    .quick-actions {
+      margin-bottom: 2rem;
+    }
+    .cycle-status { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: 1rem; margin-bottom: 1.5rem; border-radius: 10px; background: #e8f5e9; border-left: 4px solid #2e7d32; }
+    .cycle-status.pending { background: #fff8e1; border-left-color: #f9a825; }
+    .cycle-status a { color: #004d40; font-weight: 700; }
+    
+    .quick-actions h3 {
+      color: #004d40;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .action-btn {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      justify-content: center;
+    }
+    
+    .action-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0,77,64,0.3);
+    }
+    
+    .recent-events {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+    
+    .recent-events h3 {
+      color: #004d40;
+      margin-bottom: 1rem;
+    }
+    
+    .event-item {
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      border-left: 4px solid #004d40;
+    }
+    
+    .event-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .event-title {
+      font-weight: bold;
+      color: #004d40;
+      margin-bottom: 0.25rem;
+    }
+    
+    .event-description {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .event-time {
+      font-size: 0.8rem;
+      color: #999;
+      margin-top: 0.5rem;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #004d40;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #c62828;
+      margin-bottom: 1rem;
+    }
+    
+    .village-info {
+      background: #e3f2fd;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+    
+    .village-info h4 {
+      color: #1565c0;
+      margin-bottom: 0.5rem;
+    }
+    
+    .no-village {
+      background: #fff3e0;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      border-left: 4px solid #ff9800;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .dashboard-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>🌊 Lago Paranoá - Dashboard</h1>
+      <button class="logout-btn" onclick="handleLogout()">Sair</button>
+    </div>
+    
+    <div class="dashboard-content">
+      <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>Carregando seus dados...</p>
+      </div>
+      
+      <div id="error" class="error-message" style="display: none;"></div>
+      
+      <div id="content" style="display: none;">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+          <h2>Bem-vindo(a), <span id="playerName">Jogador</span>! 👋</h2>
+          <p id="welcomeSubtitle">Pronto para gerenciar seus recursos de forma sustentável?</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Água</span>
+              <span class="stat-icon">💧</span>
+            </div>
+            <div class="stat-value" id="waterCredits">0</div>
+            <div class="stat-description">créditos disponíveis</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Alimento</span>
+              <span class="stat-icon">🌾</span>
+            </div>
+            <div class="stat-value" id="foodUnits">0</div>
+            <div class="stat-description">unidades em estoque</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Nível</span>
+              <span class="stat-icon">⭐</span>
+            </div>
+            <div class="stat-value" id="playerLevel">1</div>
+            <div class="stat-description">experiência acumulada</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Sustentabilidade</span>
+              <span class="stat-icon">🌱</span>
+            </div>
+            <div class="stat-value" id="sustainabilityScore">0</div>
+            <div class="stat-description">pontuação de 0-100</div>
+          </div>
+        </div>
+        
+        <!-- Village Info -->
+        <div id="villageSection"></div>
+        <div id="cycleStatus" class="cycle-status" role="status" aria-live="polite"><span>Carregando ciclo de investigação…</span><a href="?page=crops">Abrir laboratório</a></div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h3>🎯 Ações Rápidas</h3>
+          <div class="actions-grid">
+            <a href="?page=crops" class="action-btn">
+              🧪 Investigar cultivo
+            </a>
+            <a href="?page=aquifer" class="action-btn">
+              💧 Ver Aquífero
+            </a>
+            <a href="?page=climate" class="action-btn">
+              🌦️ Clima
+            </a>
+            <a href="?page=village" class="action-btn">
+              🏘️ Minha Vila
+            </a>
+            <a href="?page=leaderboard" class="action-btn">
+              🏆 Ranking
+            </a>
+            <a href="?page=profile" class="action-btn">
+              👤 Perfil
+            </a>
+          </div>
+        </div>
+        
+        <!-- Recent Events -->
+        <div class="recent-events">
+          <h3>📰 Eventos Recentes</h3>
+          <div id="eventsContainer">
+            <p style="color: #999;">Carregando eventos...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+  <?!= include('UIComponents'); ?>
+
+  <script>
+    // Carregar dados do dashboard ao iniciar
+    window.addEventListener('DOMContentLoaded', function() {
+      loadDashboard();
+    });
+    
+    function loadDashboard() {
+      API.player.getCurrent()
+        .then(onUserDataLoaded)
+        .catch(onError);
+    }
+    
+    function onUserDataLoaded(result) {
+      if (!result || result.success !== true || !result.data || !result.data.playerId) {
+        showError((result && (result.error || result.message)) || 'Não foi possível carregar o perfil do jogador.');
+        return;
+      }
+      
+      const playerId = result.data.playerId;
+      StateManager.setPlayer(result.data.player);
+      
+      // Carregar dados do dashboard
+      API.dashboard.getData(playerId)
+        .then(onDashboardLoaded)
+        .catch(onError);
+    }
+    
+    function onDashboardLoaded(result) {
+      if (!result || result.success !== true || !result.data) {
+        showError((result && (result.error || result.message)) || 'Não foi possível carregar o dashboard.');
+        return;
+      }
+      
+      const data = result.data;
+      StateManager.setPlayer(data.player || null);
+      StateManager.setVillage(data.village || null);
+      StateManager.setAquifer(data.aquifer || null);
+      StateManager.setClimate(data.climate || null);
+      
+      // Preencher dados do jogador
+      if (data.player) {
+        document.getElementById('playerName').textContent = data.player.playerName;
+        document.getElementById('waterCredits').textContent = data.player.waterCredits;
+        document.getElementById('foodUnits').textContent = data.player.foodUnits;
+        document.getElementById('playerLevel').textContent = data.player.level;
+        document.getElementById('sustainabilityScore').textContent = data.player.sustainabilityScore;
+      }
+      if (data.initialMission) {
+        document.getElementById('welcomeSubtitle').textContent = 'Sua missão inicial: ' + data.initialMission + '. Comece por aí!';
+      }
+      const cycleStatus = document.getElementById('cycleStatus');
+      if (data.investigation && data.investigation.pendingReview) {
+        cycleStatus.classList.add('pending');
+        cycleStatus.querySelector('span').textContent = 'Rodada ' + data.investigation.pendingReview.round + ' aguarda explicação e próximo teste.';
+        cycleStatus.querySelector('a').textContent = 'Retomar revisão';
+      } else {
+        cycleStatus.classList.remove('pending');
+        const completed = data.investigation ? data.investigation.completedReviews : 0;
+        cycleStatus.querySelector('span').textContent = completed + ' ciclo(s) investigativo(s) concluído(s). Registre uma previsão para o próximo.';
+        cycleStatus.querySelector('a').textContent = 'Iniciar rodada';
+      }
+      
+      // Informações da vila
+      const villageSection = document.getElementById('villageSection');
+      if (data.village) {
+        villageSection.innerHTML = `
+          <div class="village-info">
+            <h4>🏘️ ${data.village.name}</h4>
+            <p><strong>Região:</strong> ${data.village.region}</p>
+            <p><strong>População:</strong> ${data.village.population} membros</p>
+            <p><strong>Sustentabilidade:</strong> ${data.village.sustainabilityIndex}/100</p>
+          </div>
+        `;
+      } else {
+        villageSection.innerHTML = `
+          <div class="no-village">
+            <h4>⚠️ Você não está em nenhuma vila</h4>
+            <p>Junte-se a uma vila para compartilhar recursos e competir em equipe!</p>
+            <a href="?page=village" class="action-btn" style="margin-top: 1rem; display: inline-flex;">
+              Escolher Vila
+            </a>
+          </div>
+        `;
+      }
+      
+      // Eventos recentes
+      const eventsContainer = document.getElementById('eventsContainer');
+      if (data.events && data.events.length > 0) {
+        eventsContainer.innerHTML = data.events.map(event => `
+          <div class="event-item">
+            <div class="event-title">${event.title || event.eventType}</div>
+            <div class="event-description">${event.description}</div>
+            <div class="event-time">${formatDate(event.createdAt)}</div>
+          </div>
+        `).join('');
+      } else {
+        eventsContainer.innerHTML = '<p style="color: #999;">Nenhum evento recente</p>';
+      }
+      
+      // Mostrar conteúdo e esconder loading
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+    }
+    
+    function onError(error) {
+      showError((error && error.message) || 'Erro desconhecido');
+    }
+    
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = '❌ ' + message;
+      errorDiv.style.display = 'block';
+    }
+    
+    function formatDate(dateString) {
+      if (!dateString) return 'Data desconhecida';
+      const date = new Date(dateString);
+      return date.toLocaleString('pt-BR');
+    }
+    
+    function handleLogout() {
+      var modal = document.getElementById('lp-logout-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'lp-logout-modal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:99999;padding:16px;';
+        modal.innerHTML = `
+          <div style="background:#ffffff;color:#1e293b;border:2px solid #004d40;border-radius:16px;padding:24px;max-width:400px;width:100%;box-shadow:0 16px 36px rgba(0,0,0,0.3);text-align:center;">
+            <h3 style="margin:0 0 10px;font-size:1.2rem;color:#004d40;">Sair da conta</h3>
+            <p style="margin:0 0 20px;font-size:0.92rem;color:#64748b;line-height:1.45;">Deseja realmente encerrar sua sessão?</p>
+            <div style="display:flex;gap:10px;justify-content:center;">
+              <button type="button" id="lp-logout-cancel" style="padding:8px 18px;border:1px solid #cbd5e1;background:#f1f5f9;color:#334155;border-radius:8px;cursor:pointer;font-weight:600;">Continuar</button>
+              <button type="button" id="lp-logout-ok" style="padding:8px 18px;border:none;background:#004d40;color:#ffffff;border-radius:8px;cursor:pointer;font-weight:600;">Sim, sair</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById('lp-logout-cancel').addEventListener('click', function() { modal.style.display = 'none'; });
+        document.getElementById('lp-logout-ok').addEventListener('click', function() {
+          modal.style.display = 'none';
+          API.auth.logout()
+            .then(function() {
+              window.top.location.href = <?!= JSON.stringify(appUrl + '?page=login') ?>;
+            })
+            .catch(onError);
+        });
+      }
+      modal.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

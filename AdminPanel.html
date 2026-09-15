@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Diagnóstico administrativo somente leitura do Lago Paranoá">
+  <title>Administração · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#647b76; --line:#d7e7e2; --canvas:#f3f8f6; --surface:#fff; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c98c2f; --danger:#b84a3e; --shadow:0 18px 48px rgba(18,67,59,.1); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 88% -5%,#d9eee8 0,transparent 31rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    button { font:inherit; cursor:pointer; } a { color:inherit; }
+    .page { min-height:100vh; padding:25px clamp(18px,4vw,54px) 48px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; max-width:1300px; margin:0 auto 28px; }
+    .brand { display:flex; align-items:center; gap:11px; } .mark { width:42px; height:42px; display:grid; place-items:center; border-radius:13px; color:#fff; background:var(--deep); font-size:20px; }
+    .brand strong,.brand span { display:block; } .brand span { margin-top:2px; color:var(--muted); font-size:11px; }
+    .actions { display:flex; gap:8px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; border:0; border-radius:11px; padding:11px 15px; font-weight:800; text-decoration:none; }
+    .btn-primary { color:#fff; background:var(--teal); } .btn-light { border:1px solid var(--line); color:var(--ink); background:rgba(255,255,255,.82); }
+    .content { max-width:1300px; margin:0 auto; }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; margin-bottom:20px; }
+    .hero-copy { padding:clamp(27px,4vw,46px); border-radius:23px; color:#effaf6; background:linear-gradient(120deg,#163f3b,#0c7469); box-shadow:var(--shadow); }
+    .eyebrow { margin:0 0 10px; color:#afe0d3; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; }
+    h1 { margin:0 0 12px; font-size:clamp(32px,4.8vw,54px); line-height:1.02; letter-spacing:-.045em; } .hero-copy p:last-child { max-width:720px; margin:0; color:#d9f0e9; font-size:14px; line-height:1.7; }
+    .gate-card { display:flex; flex-direction:column; justify-content:space-between; padding:23px; border:1px solid var(--line); border-radius:23px; background:#fff; box-shadow:var(--shadow); }
+    .gate-card span { color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:10px; font-weight:850; } .gate-card strong { display:block; margin:10px 0 4px; font-size:27px; } .gate-card small { padding-top:16px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+    .metric { padding:17px; border:1px solid var(--line); border-radius:15px; background:rgba(255,255,255,.85); } .metric span { display:block; color:var(--muted); font-size:11px; font-weight:750; } .metric strong { display:block; margin:8px 0 3px; font-size:25px; } .metric small { color:#789089; font-size:10px; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start; }
+    .panel { padding:22px; border:1px solid var(--line); border-radius:19px; background:#fff; box-shadow:0 8px 28px rgba(18,67,59,.055); }
+    .panel h2 { margin:0 0 5px; font-size:20px; } .panel>p { margin:0 0 17px; color:var(--muted); font-size:12px; line-height:1.6; }
+    .check-list,.event-list { display:grid; gap:8px; list-style:none; padding:0; margin:0; }
+    .check,.event { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px; align-items:start; padding:11px; border-radius:11px; background:#f4f8f7; }
+    .dot { width:10px; height:10px; margin-top:3px; border-radius:50%; background:#42a978; box-shadow:0 0 0 4px #e2f3e9; } .dot.fail { background:var(--danger); box-shadow:0 0 0 4px #fae6e2; }
+    .check strong,.check small,.event strong,.event small { display:block; } .check strong,.event strong { font-size:11px; } .check small,.event small { margin-top:3px; color:var(--muted); font-size:10px; line-height:1.4; } .check em,.event time { color:var(--muted); font-size:9px; font-style:normal; white-space:nowrap; }
+    .wide { grid-column:1/-1; } .tabs { display:flex; gap:7px; margin-bottom:14px; } .tab { border:1px solid var(--line); border-radius:99px; padding:8px 12px; color:var(--muted); background:#fff; font-weight:800; } .tab.active { color:#fff; border-color:var(--teal); background:var(--teal); }
+    .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; font-size:12px; } th { padding:10px 8px; color:var(--muted); text-align:left; text-transform:uppercase; letter-spacing:.08em; font-size:9px; } td { padding:12px 8px; border-top:1px solid #e8f0ed; } td strong { color:var(--deep); }
+    .empty { padding:25px; border:1px dashed #bad2cb; border-radius:12px; color:var(--muted); text-align:center; font-size:12px; }
+    .message { min-height:20px; margin-top:12px; color:var(--deep); font-size:12px; font-weight:700; } .message.error { color:var(--danger); } .loading { opacity:.58; pointer-events:none; }
+    @media(max-width:850px){ .hero,.grid{grid-template-columns:1fr}.wide{grid-column:auto}.metrics{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:600px){ .page{padding:15px 12px 32px}.topbar{align-items:stretch;flex-direction:column}.actions{flex-wrap:wrap}.panel{padding:17px} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="adminApp">
+    <div class="topbar"><div class="brand"><div class="mark">⌘</div><div><strong>Administração do Paranoá</strong><span>diagnóstico somente leitura</span></div></div><div class="actions"><a class="btn btn-light" href="?page=dashboard">← Painel</a><button class="btn btn-primary" type="button" data-action="refresh">↻ Atualizar diagnóstico</button></div></div>
+    <div class="content">
+      <section class="hero" aria-labelledby="pageTitle"><div class="hero-copy"><p class="eyebrow">Acesso administrativo · sem mutações automáticas</p><h1 id="pageTitle">Saúde operacional com limites explícitos.</h1><p>Contagens, gates, auditoria e cadastros são apresentados sem expor senhas e sem executar setup, seed ou migração.</p></div><aside class="gate-card" aria-live="polite"><div><span>Gate de piloto</span><strong id="pilotGate">Verificando</strong><p id="technicalGate">Smoke técnico: —</p></div><small id="syncStatus">Conectando aos serviços…</small></aside></section>
+      <section class="metrics" aria-label="Indicadores administrativos"><article class="metric"><span>Usuários</span><strong id="totalUsers">—</strong><small>contas cadastradas</small></article><article class="metric"><span>Jogadores</span><strong id="totalPlayers">—</strong><small>perfis de jogo</small></article><article class="metric"><span>Vilas</span><strong id="totalVillages">—</strong><small>territórios</small></article><article class="metric"><span>Ambiente</span><strong id="environment">—</strong><small>configuração atual</small></article></section>
+      <div class="grid">
+        <section class="panel" aria-labelledby="checksTitle"><h2 id="checksTitle">Gates e verificações</h2><p>O piloto só é liberado quando todos os requisitos técnicos e pedagógicos são comprovados.</p><ul class="check-list" id="checkList"><li class="empty">Carregando verificações…</li></ul></section>
+        <section class="panel" aria-labelledby="auditTitle"><h2 id="auditTitle">Auditoria recente</h2><p>Últimos eventos operacionais registrados na planilha.</p><ul class="event-list" id="eventList"><li class="empty">Carregando eventos…</li></ul></section>
+        <section class="panel wide" aria-labelledby="directoryTitle"><h2 id="directoryTitle">Diretório operacional</h2><p>Somente metadados de conta e vila. Credenciais nunca são enviadas ao navegador.</p><div class="tabs" role="tablist"><button class="tab active" type="button" data-view="users" role="tab" aria-selected="true">Usuários</button><button class="tab" type="button" data-view="villages" role="tab" aria-selected="false">Vilas</button></div><div class="table-wrap"><table><thead id="directoryHead"></thead><tbody id="directoryRows"><tr><td><div class="empty">Carregando diretório…</div></td></tr></tbody></table></div><div class="message" id="pageMessage" role="status" aria-live="polite"></div></section>
+      </div>
+    </div>
+  </main>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      let data={users:[],villages:[],audit:[],readiness:null,status:null};let view='users';const app=document.getElementById('adminApp');
+      function byId(id){return document.getElementById(id)}
+      function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(char){return({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[char]})}
+      function formatDate(value){const date=new Date(value);return Number.isNaN(date.getTime())?'—':date.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+      function setMessage(message,error){const target=byId('pageMessage');target.textContent=message||'';target.className='message'+(error?' error':'')}
+      function renderChecks(){const checks=data.readiness&&data.readiness.checks||[];byId('checkList').innerHTML=checks.length?checks.map(function(check){return '<li class="check"><span class="dot '+(check.ok?'':'fail')+'"></span><div><strong>'+escapeHtml(check.name)+'</strong><small>'+escapeHtml(check.detail)+'</small></div><em>'+escapeHtml(check.stage==='pilot'?'piloto':'técnico')+'</em></li>'}).join(''):'<li class="empty">Diagnóstico de prontidão indisponível.</li>'}
+      function renderAudit(){const events=data.audit||[];byId('eventList').innerHTML=events.length?events.slice().reverse().slice(0,12).map(function(event){return '<li class="event"><span class="dot"></span><div><strong>'+escapeHtml(event.eventType||'EVENTO')+'</strong><small>'+escapeHtml(event.username||event.userId||'sistema')+'</small></div><time>'+escapeHtml(formatDate(event.timestamp))+'</time></li>'}).join(''):'<li class="empty">Nenhum evento de auditoria encontrado.</li>'}
+      function renderDirectory(){const users=data.users||[];const villages=data.villages||[];document.querySelectorAll('[data-view]').forEach(function(tab){const active=tab.dataset.view===view;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});if(view==='users'){byId('directoryHead').innerHTML='<tr><th>Usuário</th><th>Email</th><th>Papel</th><th>Status</th><th>Último acesso</th></tr>';byId('directoryRows').innerHTML=users.length?users.map(function(user){return '<tr><td><strong>'+escapeHtml(user.username||user.userId)+'</strong></td><td>'+escapeHtml(user.email||'—')+'</td><td>'+escapeHtml(user.role||'player')+'</td><td>'+escapeHtml(user.status||'—')+'</td><td>'+escapeHtml(formatDate(user.lastLogin))+'</td></tr>'}).join(''):'<tr><td colspan="5"><div class="empty">Nenhum usuário.</div></td></tr>'}else{byId('directoryHead').innerHTML='<tr><th>Vila</th><th>Região</th><th>População</th><th>Água</th><th>Sustentabilidade</th></tr>';byId('directoryRows').innerHTML=villages.length?villages.map(function(village){return '<tr><td><strong>'+escapeHtml(village.name||village.villageId)+'</strong></td><td>'+escapeHtml(village.region||'—')+'</td><td>'+escapeHtml(village.population||0)+'</td><td>'+escapeHtml(village.waterAllocation||0)+'</td><td>'+escapeHtml(village.sustainabilityIndex||0)+'/100</td></tr>'}).join(''):'<tr><td colspan="5"><div class="empty">Nenhuma vila.</div></td></tr>'}}
+      function render(){const status=data.status||{};const totals=status.totals||{};const readiness=data.readiness||{};byId('totalUsers').textContent=totals.users==null?(data.users||[]).length:totals.users;byId('totalPlayers').textContent=totals.players==null?'—':totals.players;byId('totalVillages').textContent=totals.villages==null?(data.villages||[]).length:totals.villages;byId('environment').textContent=status.environment||'—';byId('pilotGate').textContent=readiness.readyForPilot?'Liberado':'Pendente';byId('technicalGate').textContent='Smoke técnico: '+(readiness.readyForTechnicalSmoke?'aprovado':'pendente');renderChecks();renderAudit();renderDirectory()}
+      async function loadData(announce){app.classList.add('loading');setMessage('',false);byId('syncStatus').textContent='Atualizando diagnóstico…';try{const result=await API.admin.getDashboard();data=API.unwrap(result);render();byId('syncStatus').textContent='Diagnóstico atualizado agora';if(announce)setMessage('Dados administrativos atualizados.',false)}catch(error){byId('syncStatus').textContent='Diagnóstico indisponível';setMessage(error.message||'Não foi possível carregar a administração.',true)}finally{app.classList.remove('loading')}}
+      document.querySelector('[data-action="refresh"]').addEventListener('click',function(){loadData(true)});document.querySelectorAll('[data-view]').forEach(function(tab){tab.addEventListener('click',function(){view=tab.dataset.view;renderDirectory()})});loadData(false)
+    })();
+  </script>
+</body>
+</html>

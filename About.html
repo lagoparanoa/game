@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre - Lago Paranoá</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 2rem;
+      color: #212121;
+    }
+    
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .hero-section {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero-section::before {
+      content: "🌊";
+      position: absolute;
+      font-size: 15rem;
+      opacity: 0.1;
+      top: -50px;
+      right: -50px;
+    }
+    
+    .hero-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .hero-section p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .content-section {
+      padding: 2.5rem;
+    }
+    
+    .section-title {
+      color: #004d40;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid #004d40;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .info-card {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 10px;
+      border-left: 4px solid #004d40;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,77,64,0.2);
+    }
+    
+    .info-card h3 {
+      color: #004d40;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .info-card p {
+      line-height: 1.6;
+      color: #424242;
+    }
+    
+    .feature-list {
+      list-style: none;
+      margin: 1.5rem 0;
+    }
+    
+    .feature-list li {
+      padding: 0.8rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .feature-list li::before {
+      content: "✓";
+      background: #004d40;
+      color: white;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .stat-box {
+      text-align: center;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      border-radius: 10px;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .team-section {
+      background: #f9f9f9;
+      padding: 2rem;
+      border-radius: 10px;
+      margin: 2rem 0;
+    }
+    
+    .back-link {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .back-link a {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #004d40;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .back-link a:hover {
+      background: #00695c;
+    }
+    
+    .reality-context {
+      background: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .reality-context h3 {
+      color: #2e7d32;
+      margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .hero-section h1 {
+        font-size: 1.8rem;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="about-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+      <h1>🌊 Lago Paranoá - O Desafio das Águas</h1>
+      <p>Um jogo educacional sobre gestão sustentável de recursos hídricos</p>
+    </div>
+    
+    <!-- Content Section -->
+    <div class="content-section">
+      <div class="section-title">
+        🎯 Sobre o Projeto
+      </div>
+      
+      <p style="font-size: 1.1rem; line-height: 1.8; margin: 1.5rem 0;">
+        <strong>Lago Paranoá - O Desafio das Águas</strong> é um jogo sério (serious game) que simula 
+        os desafios reais de gestão de recursos hídricos na Bacia do Lago Paranoá, no Distrito Federal. 
+        Desenvolvido com base em dados reais e modelos científicos, o jogo permite que estudantes e 
+        gestores experimentem dilemas ambientais, econômicos e sociais em um ambiente seguro e educativo.
+      </p>
+      
+      <!-- Reality Context -->
+      <div class="reality-context">
+        <h3>📍 Contexto Real - Bacia do Paranoá</h3>
+        <p><strong>Localização:</strong> Distrito Federal, Brasil</p>
+        <p><strong>Área da Bacia:</strong> Aproximadamente 1.034 km²</p>
+        <p><strong>População:</strong> Mais de 500 mil habitantes</p>
+        <p><strong>Importância:</strong> Abastecimento de água, lazer, turismo e preservação ambiental</p>
+        <p style="margin-top: 1rem;">
+          O Lago Paranoá é um exemplo único de recuperação ambiental. Criado na década de 1960 com 
+          a construção de Brasília, passou por grave processo de eutrofização nas décadas seguintes. 
+          Hoje, graças a políticas de saneamento e gestão, tornou-se referência em revitalização de 
+          corpos d'água urbanos.
+        </p>
+      </div>
+      
+      <!-- Statistics -->
+      <div class="stats-container">
+        <div class="stat-box">
+          <span class="stat-value">1960</span>
+          <span class="stat-label">Ano de Criação</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">48 km²</span>
+          <span class="stat-label">Superfície</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">38m</span>
+          <span class="stat-label">Prof. Média</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-value">498M m³</span>
+          <span class="stat-label">Volume</span>
+        </div>
+      </div>
+      
+      <!-- Features -->
+      <div class="section-title">
+        ⭐ Características do Jogo
+      </div>
+      
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🎮 Simulação Realista</h3>
+          <p>
+            Baseado em modelos científicos de hidrologia, climatologia e economia agrícola. 
+            Utiliza Cadeias de Markov para clima e equações de balanço hídrico para o aquífero.
+          </p>
+        </div>
+        
+        <div class="info-card">
+          <h3>🤝 Multiplayer Colaborativo</h3>
+          <p>
+            Jogadores formam vilas e competem por recursos compartilhados, vivenciando o 
+            clássico "Dilema dos Comuns" (Tragedy of the Commons) de forma prática.
+          </p>
+        </div>
+        
+        <div class="info-card">
+          <h3>📊 Análise de Dados Reais</h3>
+          <p>
+            Gráficos, relatórios e dashboards permitem visualizar o impacto de cada decisão, 
+            promovendo alfabetização de dados e pensamento sistêmico.
+          </p>
+        </div>
+        
+        <div class="info-card">
+          <h3>🌱 Sustentabilidade</h3>
+          <p>
+            Decisões de plantio, extração de água e construções afetam não apenas o jogador 
+            individual, mas toda a comunidade e o ecossistema.
+          </p>
+        </div>
+        
+        <div class="info-card">
+          <h3>🎓 Educacional</h3>
+          <p>
+            Tutoriais interativos ensinam conceitos de hidrologia, economia circular, 
+            mudanças climáticas e governança de recursos comuns.
+          </p>
+        </div>
+        
+        <div class="info-card">
+          <h3>🏆 Gamificação</h3>
+          <p>
+            Sistema de pontuação, rankings, conquistas e eventos aleatórios mantêm 
+            o engajamento e motivam decisões estratégicas.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Objetivos -->
+      <div class="section-title">
+        🎯 Objetivos Pedagógicos
+      </div>
+      
+      <ul class="feature-list">
+        <li>Compreender sistemas complexos e interdependências ambientais</li>
+        <li>Desenvolver pensamento sistêmico e visão de longo prazo</li>
+        <li>Experimentar dilemas de ação coletiva e governança</li>
+        <li>Aprender sobre recursos hídricos, aquíferos e ciclos climáticos</li>
+        <li>Praticar tomada de decisão com múltiplas variáveis e incertezas</li>
+        <li>Alfabetização de dados através de visualizações interativas</li>
+        <li>Consciência sobre sustentabilidade e impacto das ações individuais</li>
+      </ul>
+      
+      <!-- Team Section -->
+      <div class="team-section">
+        <div class="section-title">
+          👥 Equipe e Créditos
+        </div>
+        <p style="margin: 1rem 0;">
+          Este projeto foi desenvolvido como ferramenta educacional para a <strong>Escola Classe 115 Norte</strong> 
+          e comunidades do Distrito Federal, com objetivo de promover educação ambiental através de metodologias 
+          ativas e aprendizagem baseada em jogos.
+        </p>
+        <p style="margin: 1rem 0;">
+          <strong>Tecnologias utilizadas:</strong> Google Apps Script, Google Sheets, Chart.js, HTML5, CSS3, JavaScript
+        </p>
+        <p style="margin: 1rem 0;">
+          <strong>Fundamentação científica:</strong> Modelos de Cadeias de Markov, Equações de Balanço Hídrico, 
+          Teoria dos Jogos, Economia Agrícola, Dados reais da ADASA e CAESB.
+        </p>
+      </div>
+      
+      <!-- Back Link -->
+      <div class="back-link">
+        <a href="?page=dashboard">← Voltar ao Dashboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

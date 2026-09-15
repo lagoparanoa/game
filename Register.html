@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cadastro no jogo educacional Lago Paranoá">
+  <title>Criar conta · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#617873; --line:#d7e7e2; --canvas:#f2f8f6; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c98c2f; --danger:#b84a3e; --shadow:0 22px 60px rgba(18,67,59,.14); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 80% 0,#d6eee6 0,transparent 32rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    button,input { font:inherit; } a { color:var(--deep); }
+    .page { min-height:100vh; display:grid; grid-template-columns:minmax(320px,1fr) minmax(420px,1fr); }
+    .story { position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:space-between; padding:clamp(30px,6vw,76px); color:#effaf6; background:linear-gradient(145deg,#07534c,#118475); }
+    .story::after { content:""; position:absolute; right:-130px; bottom:-170px; width:460px; height:460px; border:1px solid rgba(255,255,255,.18); border-radius:50%; box-shadow:0 0 0 46px rgba(255,255,255,.05),0 0 0 92px rgba(255,255,255,.035); }
+    .brand { position:relative; z-index:1; display:flex; align-items:center; gap:11px; font-weight:850; } .mark { width:43px; height:43px; display:grid; place-items:center; border-radius:14px; color:var(--deep); background:#dff4ed; font-size:22px; }
+    .story-copy { position:relative; z-index:1; max-width:620px; margin:70px 0; } .eyebrow { margin:0 0 11px; color:#afe0d3; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; } h1 { margin:0 0 14px; font-size:clamp(39px,6vw,70px); line-height:.98; letter-spacing:-.055em; } .story-copy>p:last-of-type { max-width:580px; color:#d9f0e9; font-size:14px; line-height:1.72; }
+    .steps { display:grid; gap:9px; margin-top:26px; list-style:none; padding:0; } .steps li { display:flex; align-items:center; gap:10px; color:#d9f0e9; font-size:12px; } .steps span { width:25px; height:25px; display:grid; place-items:center; border-radius:50%; color:var(--deep); background:#dff4ed; font-size:10px; font-weight:900; }
+    .story small { position:relative; z-index:1; color:#a9d0c6; font-size:10px; }
+    .form-side { display:grid; place-items:center; padding:clamp(24px,5vw,64px); }
+    .card { width:min(500px,100%); padding:clamp(25px,4vw,42px); border:1px solid var(--line); border-radius:23px; background:rgba(255,255,255,.92); box-shadow:var(--shadow); }
+    .card h2 { margin:0 0 7px; font-size:28px; letter-spacing:-.035em; } .card-header>p { margin:0 0 22px; color:var(--muted); font-size:12px; line-height:1.6; }
+    .alert { display:none; margin-bottom:15px; padding:12px; border-radius:11px; font-size:12px; line-height:1.5; } .alert.error { display:block; color:#96392f; background:#fbe7e3; } .alert.success { display:block; color:#276f58; background:#e4f4ea; }
+    .field { margin-bottom:15px; } label { display:block; margin-bottom:6px; font-size:12px; font-weight:800; } input { width:100%; padding:12px 13px; border:1px solid #bdd2cc; border-radius:10px; outline:none; color:var(--ink); background:#fff; } input:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(11,116,105,.12); } input[aria-invalid="true"] { border-color:var(--danger); } .hint { display:block; margin-top:5px; color:var(--muted); font-size:10px; }
+    .password-wrap { position:relative; } .password-wrap input { padding-right:75px; } .reveal { position:absolute; top:50%; right:8px; transform:translateY(-50%); border:0; border-radius:7px; padding:6px 8px; color:var(--deep); background:var(--mint); font-size:10px; font-weight:850; cursor:pointer; }
+    .requirements { display:flex; flex-wrap:wrap; gap:6px; margin:-6px 0 15px; padding:0; list-style:none; } .requirements li { padding:5px 8px; border-radius:999px; color:var(--muted); background:#edf3f1; font-size:9px; font-weight:750; } .requirements li[data-met="true"] { color:#256c56; background:#dcf1e8; }
+    .notice { margin:3px 0 17px; padding:12px; border-left:4px solid var(--gold); border-radius:0 10px 10px 0; color:#705727; background:#fff8e8; font-size:10px; line-height:1.55; }
+    .acknowledgement { display:grid; grid-template-columns:auto 1fr; gap:9px; align-items:start; margin:0 0 17px; color:var(--ink); font-size:10px; font-weight:650; line-height:1.5; } .acknowledgement input { width:17px; height:17px; margin:0; accent-color:var(--teal); }
+    .submit { width:100%; border:0; border-radius:11px; padding:13px 16px; color:#fff; background:var(--teal); font-weight:850; cursor:pointer; } .submit:disabled { cursor:not-allowed; opacity:.62; } form[aria-busy="true"] .submit:disabled { cursor:wait; }
+    .footer { margin:18px 0 0; color:var(--muted); text-align:center; font-size:11px; } .footer a { font-weight:850; text-decoration:none; }
+    @media(max-width:850px){ .page{grid-template-columns:1fr}.story{min-height:430px}.story-copy{margin:55px 0}.form-side{padding:22px 14px 40px} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="story" aria-labelledby="storyTitle"><div class="brand"><span class="mark">◒</span><span>Paranoá vivo</span></div><div class="story-copy"><p class="eyebrow">Simulação educacional da bacia</p><h1 id="storyTitle">Entre para uma comunidade de decisões.</h1><p>Crie um identificador de jogo, escolha sua vila depois do acesso e investigue como clima, agricultura e cooperação alteram o Lago Paranoá.</p><ol class="steps"><li><span>1</span>Crie uma conta de atividade.</li><li><span>2</span>Observe clima, água e território.</li><li><span>3</span>Registre previsão, decisão e revisão.</li></ol></div><small>Use somente dados autorizados pela escola.</small></section>
+    <section class="form-side" aria-labelledby="registerTitle">
+      <div class="card"><header class="card-header"><h2 id="registerTitle">Criar conta</h2><p>Preencha os dados combinados com seu educador. Evite informações pessoais desnecessárias.</p></header><div id="register-alert" class="alert" role="status" aria-live="polite"></div>
+        <form id="register-form" aria-describedby="credentialNotice" aria-busy="false">
+          <div class="field"><label for="register-username">Identificador de usuário</label><input inputmode="text" id="register-username" name="username" type="text" minlength="3" maxlength="40" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" placeholder="ex.: equipe-ipe" autofocus required><span class="hint">Use um apelido escolar, não o nome completo.</span></div>
+          <div class="field"><label for="register-email">E-mail autorizado</label><input id="register-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" enterkeyhint="next" placeholder="usuario@dominio.com" required></div>
+          <div class="field"><label for="register-password">Senha da atividade</label><div class="password-wrap"><input inputmode="text" id="register-password" name="password" type="password" minlength="6" maxlength="72" autocomplete="new-password" enterkeyhint="next" placeholder="Mínimo 6 caracteres" aria-describedby="passwordRequirements" required><button class="reveal" type="button" data-toggle-password="register-password" aria-controls="register-password" aria-pressed="false">Mostrar</button></div></div>
+          <div class="field"><label for="register-password-confirmation">Confirmar senha</label><div class="password-wrap"><input inputmode="text" id="register-password-confirmation" name="passwordConfirmation" type="password" minlength="6" maxlength="72" autocomplete="new-password" enterkeyhint="done" placeholder="Repita a senha" aria-describedby="passwordRequirements" required><button class="reveal" type="button" data-toggle-password="register-password-confirmation" aria-controls="register-password-confirmation" aria-pressed="false">Mostrar</button></div></div>
+          <ul class="requirements" id="passwordRequirements" aria-live="polite"><li id="passwordLength" data-met="false">6 ou mais caracteres</li><li id="passwordMatch" data-met="false">Senhas iguais</li></ul>
+          <div class="notice" id="credentialNotice">Esta implantação mantém autenticação em texto plano. Use uma senha exclusiva para a atividade e nunca reutilize senha pessoal.</div>
+          <label class="acknowledgement" for="credentialAcknowledgement"><input id="credentialAcknowledgement" type="checkbox" required><span>Entendi o cuidado com a senha e li a <a href="<?= appUrl ?>?page=privacy" target="_top">política de privacidade</a>.</span></label>
+          <button class="submit" id="submitButton" type="submit" disabled>Criar conta e continuar</button>
+        </form><p class="footer">Já tem conta? <a href="<?= appUrl ?>?page=login" target="_top">Entrar</a> · <a href="<?= appUrl ?>?page=privacy" target="_top">Privacidade</a></p>
+      </div>
+    </section>
+  </main>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      const form = document.getElementById('register-form');
+      const submit = document.getElementById('submitButton');
+      const usernameInput = document.getElementById('register-username');
+      const emailInput = document.getElementById('register-email');
+      const passwordInput = document.getElementById('register-password');
+      const confirmationInput = document.getElementById('register-password-confirmation');
+      const acknowledgement = document.getElementById('credentialAcknowledgement');
+      let busy = false;
+
+      function show(message, type) {
+        const box = document.getElementById('register-alert');
+        box.textContent = String(message || 'Não foi possível concluir a solicitação.');
+        box.className = 'alert ' + (type === 'success' ? 'success' : 'error');
+      }
+
+      function passwordsMatch() {
+        return confirmationInput.value.length > 0 && passwordInput.value === confirmationInput.value;
+      }
+
+      function updateState() {
+        const longEnough = passwordInput.value.length >= 6;
+        const matching = passwordsMatch();
+        document.getElementById('passwordLength').dataset.met = String(longEnough);
+        document.getElementById('passwordMatch').dataset.met = String(matching);
+        confirmationInput.setAttribute('aria-invalid', confirmationInput.value.length > 0 && !matching ? 'true' : 'false');
+        submit.disabled = busy || !form.checkValidity() || !matching;
+      }
+
+      function setBusy(nextBusy) {
+        busy = nextBusy;
+        submit.textContent = busy ? 'Criando conta…' : 'Criar conta e continuar';
+        form.setAttribute('aria-busy', String(busy));
+        updateState();
+      }
+
+      document.querySelectorAll('[data-toggle-password]').forEach(function(button) {
+        button.addEventListener('click', function() {
+          const input = document.getElementById(button.dataset.togglePassword);
+          const revealing = input.type === 'password';
+          input.type = revealing ? 'text' : 'password';
+          button.textContent = revealing ? 'Ocultar' : 'Mostrar';
+          button.setAttribute('aria-pressed', String(revealing));
+        });
+      });
+
+      [usernameInput, emailInput, passwordInput, confirmationInput, acknowledgement].forEach(function(field) {
+        field.addEventListener('input', updateState);
+        field.addEventListener('change', updateState);
+      });
+
+      form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        updateState();
+        if (!form.reportValidity()) return;
+        if (!passwordsMatch()) {
+          show('As duas senhas precisam ser iguais.', 'error');
+          confirmationInput.focus();
+          return;
+        }
+
+        setBusy(true);
+        try {
+          const result = await API.auth.register({
+            username: usernameInput.value.trim(),
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+          });
+          if (!result || result.success !== true) {
+            throw new Error(result && (result.error || result.message) || 'Cadastro não concluído.');
+          }
+          show(result.message || 'Conta criada. Abrindo o painel…', 'success');
+          setTimeout(function(){ window.top.location.href = <?!= JSON.stringify(appUrl + '?page=dashboard') ?>; }, 900);
+        } catch(error) {
+          passwordInput.value = '';
+          confirmationInput.value = '';
+          show(error && error.message || 'Não foi possível criar a conta.', 'error');
+          setBusy(false);
+          passwordInput.focus();
+        }
+      });
+
+      updateState();
+    })();
+  </script>
+</body>
+</html>

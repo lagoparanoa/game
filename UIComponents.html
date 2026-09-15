@@ -1,0 +1,457 @@
+<script>
+/**
+ * @file UIComponents.html  
+ * @description Reusable UI components
+ * @version 1.0.0
+ */
+
+const Components = (function() {
+  'use strict';
+  
+  /**
+   * Loading Spinner
+   */
+  function createLoader(text = 'Carregando...') {
+    return `
+      <div class="loader-container">
+        <div class="loader"></div>
+        <p class="loader-text">${text}</p>
+      </div>
+    `;
+  }
+  
+  /**
+   * Alert Message
+   */
+  function createAlert(message, type = 'info', dismissible = true) {
+    const icons = {
+      success: '✓',
+      error: '✗',
+      warning: '⚠',
+      info: 'ℹ'
+    };
+    
+    return `
+      <div class="alert alert-${type}" role="alert">
+        <span class="alert-icon">${icons[type]}</span>
+        <span class="alert-message">${message}</span>
+        ${dismissible ? '<button class="alert-close" onclick="this.parentElement.remove()">×</button>' : ''}
+      </div>
+    `;
+  }
+  
+  /**
+   * Card Component
+   */
+  function createCard({ title, content, icon, footer, className = '' }) {
+    return `
+      <div class="card ${className}">
+        ${icon ? `<div class="card-icon">${icon}</div>` : ''}
+        ${title ? `<h3 class="card-title">${title}</h3>` : ''}
+        <div class="card-content">${content}</div>
+        ${footer ? `<div class="card-footer">${footer}</div>` : ''}
+      </div>
+    `;
+  }
+  
+  /**
+   * Modal Dialog
+   */
+  function createModal({ title, content, buttons = [], onClose }) {
+    const modalHTML = `
+      <div class="modal-overlay" onclick="Components.closeModal(this)">
+        <div class="modal-dialog" onclick="event.stopPropagation()">
+          <div class="modal-header">
+            <h2 class="modal-title">${title}</h2>
+            <button class="modal-close" onclick="Components.closeModal(this)">×</button>
+          </div>
+          <div class="modal-body">
+            ${content}
+          </div>
+          ${buttons.length > 0 ? `
+            <div class="modal-footer">
+              ${buttons.map(btn => `
+                <button class="btn btn-${btn.type || 'secondary'}" 
+                        onclick="${btn.onClick}">
+                  ${btn.text}
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    if (onClose) {
+      const modal = document.querySelector('.modal-overlay:last-child');
+      modal.addEventListener('close', onClose);
+    }
+  }
+  
+  /**
+   * Close Modal
+   */
+  function closeModal(element) {
+    const modal = element.closest('.modal-overlay');
+    if (modal) {
+      modal.dispatchEvent(new Event('close'));
+      modal.remove();
+    }
+  }
+  
+  /**
+   * Progress Bar
+   */
+  function createProgressBar(value, max = 100, label = '') {
+    const percentage = (value / max) * 100;
+    
+    return `
+      <div class="progress-bar-container">
+        ${label ? `<div class="progress-label">${label}</div>` : ''}
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${percentage}%"></div>
+          <span class="progress-text">${value}/${max}</span>
+        </div>
+      </div>
+    `;
+  }
+  
+  /**
+   * Badge/Tag
+   */
+  function createBadge(text, type = 'primary') {
+    return `<span class="badge badge-${type}">${text}</span>`;
+  }
+  
+  /**
+   * Tooltip
+   */
+  function createTooltip(text, position = 'top') {
+    return `<span class="tooltip tooltip-${position}" data-tooltip="${text}">?</span>`;
+  }
+
+  function createMissionBannerElement(mission) {
+    if (!mission) return null;
+
+    const section = document.createElement('section');
+    section.id = 'mission-banner';
+    section.className = 'mission-banner';
+    section.setAttribute('role', 'status');
+    section.setAttribute('aria-live', 'polite');
+
+    const inner = document.createElement('div');
+    inner.className = 'mission-banner-inner';
+
+    const icon = document.createElement('span');
+    icon.className = 'mission-banner-icon';
+    icon.textContent = '🎯';
+
+    const content = document.createElement('div');
+    const title = document.createElement('strong');
+    title.textContent = 'Missão inicial';
+
+    const description = document.createElement('p');
+    description.textContent = mission;
+
+    content.appendChild(title);
+    content.appendChild(description);
+    inner.appendChild(icon);
+    inner.appendChild(content);
+    section.appendChild(inner);
+
+    return section;
+  }
+
+  function ensureMissionBannerStyles() {
+    if (document.getElementById('mission-banner-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'mission-banner-styles';
+    style.textContent = `
+      .mission-banner {
+        background: #e8f5e9;
+        border-left: 4px solid #4caf50;
+        color: #1b5e20;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        border-radius: 0 0 18px 18px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      }
+      .mission-banner-inner {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .mission-banner-icon {
+        font-size: 1.7rem;
+        line-height: 1;
+      }
+      .mission-banner strong {
+        display: block;
+        font-size: 1rem;
+        margin-bottom: 0.35rem;
+      }
+      .mission-banner p {
+        margin: 0;
+        color: #235a27;
+        line-height: 1.5;
+      }
+    `;
+
+    document.head.appendChild(style);
+  }
+
+  function insertMissionBanner(mission) {
+    if (!mission || document.getElementById('mission-banner')) return;
+    ensureMissionBannerStyles();
+
+    const banner = createMissionBannerElement(mission);
+    if (!banner) return;
+
+    const target = document.querySelector('.content') || document.body;
+    target.insertBefore(banner, target.firstChild);
+  }
+
+  function initMissionBanner() {
+    if (document.documentElement.dataset.missionBannerReady === 'true') return;
+    document.documentElement.dataset.missionBannerReady = 'true';
+
+    if (typeof API === 'undefined' || !API.auth || !API.auth.getCurrentUser) return;
+
+    API.auth.getCurrentUser()
+      .then(function(result) {
+        if (result && result.success && result.data && result.data.user && result.data.user.initialMission) {
+          insertMissionBanner(result.data.user.initialMission);
+        }
+      })
+      .catch(function () {
+        // Não bloquear páginas em caso de falha de sessão.
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', initMissionBanner);
+  
+  /**
+   * Table
+   */
+  function createTable({ headers, rows, className = '' }) {
+    return `
+      <table class="data-table ${className}">
+        <thead>
+          <tr>
+            ${headers.map(h => `<th>${h}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(row => `
+            <tr>
+              ${row.map(cell => `<td>${cell}</td>`).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+  
+  /**
+   * Breadcrumb
+   */
+  function createBreadcrumb(items) {
+    return `
+      <nav class="breadcrumb">
+        ${items.map((item, index) => `
+          ${index > 0 ? '<span class="breadcrumb-separator">›</span>' : ''}
+          ${item.url ? 
+            `<a href="${item.url}" class="breadcrumb-item">${item.text}</a>` :
+            `<span class="breadcrumb-item active">${item.text}</span>`
+          }
+        `).join('')}
+      </nav>
+    `;
+  }
+  
+  /**
+   * Empty State
+   */
+  function createEmptyState({ icon, title, message, action }) {
+    return `
+      <div class="empty-state">
+        <div class="empty-icon">${icon}</div>
+        <h3 class="empty-title">${title}</h3>
+        <p class="empty-message">${message}</p>
+        ${action ? `
+          <button class="btn btn-primary" onclick="${action.onClick}">
+            ${action.text}
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }
+  
+  /** Renderiza uma série curta como barras HTML acessíveis e responsivas. */
+  function createChartContainer(id, title, series = []) {
+    const escape = value => String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const points = (Array.isArray(series) ? series : []).map((point, index) => ({
+      label: point && typeof point === 'object' ? (point.label || `Item ${index + 1}`) : `Item ${index + 1}`,
+      value: Number(point && typeof point === 'object' ? point.value : point)
+    })).filter(point => Number.isFinite(point.value)).slice(0, 12);
+    const maximum = Math.max(1, ...points.map(point => Math.abs(point.value)));
+    const bars = points.length ? points.map(point => `
+      <div class="chart-bar-row">
+        <span class="chart-bar-label">${escape(point.label)}</span>
+        <span class="chart-bar-track"><span class="chart-bar-value" style="width:${Math.max(0, Math.min(100, Math.abs(point.value) / maximum * 100))}%"></span></span>
+        <strong class="chart-bar-number">${escape(point.value)}</strong>
+      </div>
+    `).join('') : '<p class="chart-empty" role="status">Ainda não há dados para esta visualização.</p>';
+    return `
+      <figure class="chart-container" data-chart-id="${escape(id)}" data-chart-state="${points.length ? 'ready' : 'empty'}">
+        ${title ? `<figcaption class="chart-title">${escape(title)}</figcaption>` : ''}
+        <div class="chart-bars" role="img" aria-label="${escape(title || 'Gráfico de barras')}">${bars}</div>
+      </figure>
+    `;
+  }
+  
+  /**
+   * Stat Card
+   */
+  function createStatCard({ value, label, icon, trend, color = 'primary' }) {
+    return `
+      <div class="stat-card stat-${color}">
+        <div class="stat-header">
+          <span class="stat-icon">${icon}</span>
+          ${trend ? `
+            <span class="stat-trend ${trend > 0 ? 'up' : 'down'}">
+              ${trend > 0 ? '↑' : '↓'} ${Math.abs(trend)}%
+            </span>
+          ` : ''}
+        </div>
+        <div class="stat-value">${value}</div>
+        <div class="stat-label">${label}</div>
+      </div>
+    `;
+  }
+  
+  /**
+   * Notification Toast
+   */
+  function showToast(message, type = 'info', duration = 3000) {
+    const toastContainer = document.getElementById('toast-container') || 
+      (() => {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+      })();
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    
+    toastContainer.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove after duration
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+  
+  /**
+   * Confirmation Dialog
+   */
+  function confirm({ title, message, onConfirm, onCancel }) {
+    createModal({
+      title,
+      content: `<p>${message}</p>`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          type: 'secondary',
+          onClick: () => {
+            closeModal(event.target);
+            if (onCancel) onCancel();
+          }
+        },
+        {
+          text: 'Confirmar',
+          type: 'primary',
+          onClick: () => {
+            closeModal(event.target);
+            if (onConfirm) onConfirm();
+          }
+        }
+      ]
+    });
+  }
+  
+  /**
+   * Pagination
+   */
+  function createPagination(currentPage, totalPages, onPageChange) {
+    const pages = [];
+    const maxVisible = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return `
+      <div class="pagination">
+        <button class="pagination-btn" 
+                ${currentPage === 1 ? 'disabled' : ''}
+                onclick="${onPageChange}(${currentPage - 1})">
+          ‹ Anterior
+        </button>
+        
+        ${pages.map(page => `
+          <button class="pagination-page ${page === currentPage ? 'active' : ''}"
+                  onclick="${onPageChange}(${page})">
+            ${page}
+          </button>
+        `).join('')}
+        
+        <button class="pagination-btn"
+                ${currentPage === totalPages ? 'disabled' : ''}
+                onclick="${onPageChange}(${currentPage + 1})">
+          Próxima ›
+        </button>
+      </div>
+    `;
+  }
+  
+  // Public API
+  return {
+    createLoader,
+    createAlert,
+    createCard,
+    createModal,
+    closeModal,
+    createProgressBar,
+    createBadge,
+    createTooltip,
+    createTable,
+    createBreadcrumb,
+    createEmptyState,
+    createChartContainer,
+    createStatCard,
+    showToast,
+    confirm,
+    createPagination
+  };
+})();
+</script>

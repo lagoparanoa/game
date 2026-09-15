@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Lago Paranoá - Jogo Educacional de Gestão de Recursos Hídricos">
+  <title>🌊 Lago Paranoá - O Desafio das Águas</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header Principal */
+    .main-header {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .logo-icon {
+      font-size: 2.5rem;
+    }
+    
+    .logo-text h1 {
+      font-size: 1.5rem;
+      color: #004d40;
+      font-weight: 700;
+    }
+    
+    .logo-text p {
+      font-size: 0.85rem;
+      color: #666;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .btn {
+      padding: 0.6rem 1.5rem;
+      border: none;
+      border-radius: 25px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .btn-primary {
+      background: #004d40;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #00695c;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,77,64,0.3);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: #004d40;
+      border: 2px solid #004d40;
+    }
+    
+    .btn-secondary:hover {
+      background: #004d40;
+      color: white;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem 2rem;
+      text-align: center;
+      color: white;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+    }
+    
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      animation: fadeInDown 1s ease;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+      animation: fadeInUp 1s ease 0.2s both;
+    }
+    
+    .hero-description {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      opacity: 0.9;
+      animation: fadeInUp 1s ease 0.4s both;
+    }
+    
+    .hero-cta {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeInUp 1s ease 0.6s both;
+    }
+    
+    .btn-large {
+      padding: 1rem 2.5rem;
+      font-size: 1.2rem;
+    }
+    
+    /* Features Section */
+    .features-section {
+      background: white;
+      padding: 4rem 2rem;
+    }
+    
+    .features-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .features-title {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #004d40;
+      margin-bottom: 3rem;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    
+    .feature-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 2rem;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .feature-title {
+      font-size: 1.3rem;
+      color: #004d40;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+    
+    .feature-description {
+      color: #555;
+      line-height: 1.6;
+    }
+    
+    /* Footer */
+    .main-footer {
+      background: #1a1a2e;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .footer-links a {
+      color: #80deea;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+    }
+    
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.5rem;
+      }
+      
+      .hero-subtitle {
+        font-size: 1.2rem;
+      }
+      
+      .hero-cta {
+        flex-direction: column;
+      }
+      
+      .main-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="main-header">
+    <div class="logo-section">
+      <div class="logo-icon">🌊</div>
+      <div class="logo-text">
+        <h1>Lago Paranoá</h1>
+        <p>O Desafio das Águas</p>
+      </div>
+    </div>
+    <nav class="header-actions">
+      <a href="?page=about" class="btn btn-secondary">Sobre</a>
+      <a href="?page=login" class="btn btn-primary">Entrar</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h2 class="hero-title">Gerencie Recursos Hídricos</h2>
+      <p class="hero-subtitle">🎓 Aprenda sustentabilidade através da experiência</p>
+      <p class="hero-description">
+        Um jogo educacional que coloca você no papel de gestor da Bacia do Lago Paranoá. 
+        Tome decisões sobre agricultura, uso da água e desenvolvimento sustentável enquanto 
+        enfrenta desafios climáticos e econômicos reais.
+      </p>
+      <div class="hero-cta">
+        <a href="?page=register" class="btn btn-primary btn-large">Começar Agora</a>
+        <a href="?page=tutorial" class="btn btn-secondary btn-large">Como Jogar</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="features-container">
+      <h3 class="features-title">Por Que Jogar?</h3>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🌦️</div>
+          <h4 class="feature-title">Clima Didático</h4>
+          <p class="feature-description">
+            Compare medições persistidas com cenários sazonais simplificados
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💧</div>
+          <h4 class="feature-title">Aquífero Compartilhado</h4>
+          <p class="feature-description">
+            Experimente o dilema dos recursos comuns em primeira mão
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌾</div>
+          <h4 class="feature-title">Agricultura Estratégica</h4>
+          <p class="feature-description">
+            Escolha culturas, gerencie irrigação e maximize sua produção
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h4 class="feature-title">Economia Dinâmica</h4>
+          <p class="feature-description">
+            Preços de mercado que respondem à oferta e demanda coletiva
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🏘️</div>
+          <h4 class="feature-title">Jogue em Equipe</h4>
+          <p class="feature-description">
+            Forme vilas com colegas e tomem decisões coletivas
+          </p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h4 class="feature-title">Aprenda Fazendo</h4>
+          <p class="feature-description">
+            Visualize impactos de suas decisões através de gráficos e análises
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="?page=about">Sobre o Projeto</a>
+        <a href="?page=help">Ajuda</a>
+        <a href="?page=privacy">Privacidade</a>
+        <a href="https://github.com/lago-paranoa" target="_blank">GitHub</a>
+      </div>
+      <p>&copy; 2026 Lago Paranoá - Escola Classe 115 Norte</p>
+      <p style="opacity: 0.7; margin-top: 0.5rem;">Desenvolvido com 💚 para educação ambiental</p>
+    </div>
+  </footer>
+
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+  <?!= include('UIComponents'); ?>
+<!-- fleet-method-guide:start -->
+<style>
+  .fleet-method-guide { box-sizing: border-box; flex: 0 0 auto; grid-column: 1 / -1; width: calc(100% - 2rem); max-width: 64rem; margin: 1rem auto; border: 1px solid currentColor; border-radius: .65rem; color: inherit; background: inherit; font: inherit; }
+  .fleet-method-guide > summary { cursor: pointer; padding: .75rem 1rem; min-height: 44px; box-sizing: border-box; font-weight: 600; overflow-wrap: anywhere; }
+  .fleet-method-guide > summary:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+  .fleet-method-guide .fleet-method-content { padding: 0 1rem 1rem; max-height: 50vh; overflow-y: auto; overscroll-behavior: contain; }
+  .fleet-method-guide p { margin: .5rem 0; line-height: 1.5; overflow-wrap: anywhere; }
+  .fleet-method-guide dl { display: grid; grid-template-columns: minmax(0, 1fr); gap: .35rem; margin: .75rem 0 1rem; }
+  .fleet-method-guide dt { font-weight: 600; margin-top: .5rem; }
+  .fleet-method-guide dd { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
+  @media print { .fleet-method-guide { display: none; } }
+</style>
+<details class="fleet-method-guide" data-project="lago_paranoa">
+  <summary>Como conduzir esta atividade</summary>
+  <div class="fleet-method-content">
+    <p>Lago Paranoá</p>
+    <section aria-label="Para quem participa">
+      <p><strong>Para quem participa</strong></p>
+      <dl>
+        <dt>Propósito</dt><dd>Tomar decisões sobre recursos hídricos e observar consequências.</dd>
+        <dt>Ação</dt><dd>Fazer uma previsão, simular uma decisão e interpretar indicadores.</dd>
+        <dt>Fechamento</dt><dd>Revisar a estratégia com base no que aconteceu.</dd>
+      </dl>
+    </section>
+    <section aria-label="Para quem conduz a turma">
+      <p><strong>Para quem conduz a turma</strong></p>
+      <dl>
+        <dt>Propósito</dt><dd>Mediar relações entre decisão, impacto e contexto do Distrito Federal.</dd>
+        <dt>Ação</dt><dd>Acompanhar simulações e perguntas dos grupos.</dd>
+        <dt>Fechamento</dt><dd>Comparar estratégias e registrar uma questão para investigação.</dd>
+      </dl>
+    </section>
+  </div>
+</details>
+<!-- fleet-method-guide:end -->
+</body>
+</html>

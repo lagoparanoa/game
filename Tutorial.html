@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial - Lago Paranoá</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .tutorial-container {
+      max-width: 900px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: #e0e0e0;
+      position: relative;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    .tutorial-content {
+      padding: 3rem;
+    }
+    
+    .step-indicator {
+      text-align: center;
+      color: #757575;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .step-title {
+      font-size: 2rem;
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .step-content {
+      line-height: 1.8;
+      color: #424242;
+      margin-bottom: 2rem;
+    }
+    
+    .step-image {
+      text-align: center;
+      font-size: 8rem;
+      margin: 2rem 0;
+    }
+    
+    .info-box {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    }
+    
+    .info-box h3 {
+      color: #2e7d32;
+      margin-bottom: 0.8rem;
+    }
+    
+    .info-box ul {
+      margin-left: 1.5rem;
+      line-height: 1.8;
+    }
+    
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .btn-prev {
+      background: #e0e0e0;
+      color: #424242;
+    }
+    
+    .btn-prev:hover {
+      background: #bdbdbd;
+    }
+    
+    .btn-next {
+      background: #2e7d32;
+      color: white;
+    }
+    
+    .btn-next:hover {
+      background: #388e3c;
+      transform: translateX(5px);
+    }
+    
+    .btn-finish {
+      background: #4caf50;
+      color: white;
+    }
+    
+    .btn-finish:hover {
+      background: #66bb6a;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .concept-card {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+    }
+    
+    .concept-card h4 {
+      color: #2e7d32;
+      margin-bottom: 0.5rem;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .step-content {
+      animation: fadeIn 0.5s ease;
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="tutorial-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    
+    <div class="tutorial-content">
+      <div class="step-indicator" id="step-indicator">Passo 1 de 7</div>
+      <div id="tutorial-steps"></div>
+      
+      <div class="navigation-buttons">
+        <button class="btn btn-prev" id="btn-prev" onclick="prevStep()" disabled>
+          ← Anterior
+        </button>
+        <button class="btn btn-next" id="btn-next" onclick="nextStep()">
+          Próximo →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tutorialSteps = [
+      {
+        title: "🌊 Bem-vindo ao Lago Paranoá!",
+        image: "🌊",
+        content: `
+          <p>Você é um gestor de uma vila na Bacia do Lago Paranoá, no Distrito Federal. 
+          Seu objetivo é desenvolver sua comunidade de forma sustentável, equilibrando 
+          crescimento econômico e preservação dos recursos hídricos.</p>
+          
+          <div class="info-box">
+            <h3>🎯 Seu Desafio</h3>
+            <ul>
+              <li>Gerenciar recursos hídricos compartilhados</li>
+              <li>Tomar decisões agrícolas estratégicas</li>
+              <li>Cooperar (ou competir) com outras vilas</li>
+              <li>Adaptar-se às mudanças climáticas</li>
+            </ul>
+          </div>
+        `
+      },
+      {
+        title: "💧 O Aquífero Compartilhado",
+        image: "💧",
+        content: `
+          <p>O aquífero é um reservatório subterrâneo de água compartilhado por todas as vilas. 
+          É o coração do jogo!</p>
+          
+          <div class="concept-card">
+            <h4>Como funciona:</h4>
+            <p><strong>Recarga:</strong> A cada rodada, chuvas recarregam o aquífero. A quantidade 
+            depende do clima.</p>
+            <p><strong>Extração:</strong> Cada vila extrai água para irrigação. A soma de todas as 
+            extrações reduz o nível total.</p>
+            <p><strong>Colapso:</strong> Se o aquífero secar (nível ≤ 0), todas as vilas sofrem 
+            penalidades severas!</p>
+          </div>
+          
+          <div class="info-box">
+            <h3>⚠️ Dilema dos Comuns</h3>
+            <p>Extrair mais água aumenta sua produção, mas prejudica todos a longo prazo. 
+            Este é um dilema real enfrentado por comunidades ao redor do mundo.</p>
+          </div>
+        `
+      },
+      {
+        title: "🌦️ Sistema Climático",
+        image: "🌦️",
+        content: `
+          <p>O jogo usa um <strong>modelo sazonal didático</strong> para comparar
+          períodos secos e úmidos. Ele ajuda a formular hipóteses, mas não é uma
+          previsão meteorológica oficial.</p>
+          
+          <div class="concept-card">
+            <h4>Estados do Clima:</h4>
+            <p><strong>Período Seco:</strong> Menor precipitação estimada e recarga reduzida.</p>
+            <p><strong>Período Úmido:</strong> Maior precipitação estimada e recarga ampliada.</p>
+          </div>
+          
+          <div class="info-box">
+            <h3>📊 Medição e estimativa</h3>
+            <p>O relatório climático identifica separadamente o que foi
+            persistido como medição e o que é estimativa do modelo. Compare as
+            duas fontes antes de planejar.</p>
+          </div>
+        `
+      },
+      {
+        title: "🌾 Escolha de Culturas",
+        image: "🌾",
+        content: `
+          <p>A cada rodada, você escolhe quais culturas plantar. Cada cultura tem características 
+          únicas de consumo hídrico e retorno financeiro.</p>
+          
+          <div class="concept-card">
+            <h4>Compare antes de escolher:</h4>
+            <p>A tela de culturas carrega do servidor o consumo hídrico, o
+            ciclo e o preço de cada opção disponível. Esses valores podem mudar
+            conforme a configuração da atividade.</p>
+          </div>
+          
+          <div class="info-box">
+            <h3>💡 Dica Estratégica</h3>
+            <p>Culturas de alto retorno consomem mais água. Se o aquífero estiver baixo, 
+            considere culturas mais eficientes mesmo com menor lucro.</p>
+          </div>
+        `
+      },
+      {
+        title: "💰 Economia e Finanças",
+        image: "💰",
+        content: `
+          <p>Gerencie seus fundos com sabedoria! Você precisa equilibrar investimentos e 
+          receitas para manter sua vila próspera.</p>
+          
+          <div class="concept-card">
+            <h4>Fluxo Financeiro:</h4>
+            <p><strong>Receitas:</strong> Venda de colheitas no mercado</p>
+            <p><strong>Custos:</strong> Sementes, irrigação, manutenção</p>
+            <p><strong>Investimentos:</strong> Infraestrutura (sistemas eficientes, etc.)</p>
+          </div>
+          
+          <div class="info-box">
+            <h3>⚠️ Atenção!</h3>
+            <p>Consulte o módulo econômico para conferir receitas, despesas e
+            transações persistidas antes de assumir um novo custo.</p>
+          </div>
+        `
+      },
+      {
+        title: "🏘️ Vilas e Cooperação",
+        image: "🏘️",
+        content: `
+          <p>Você não está sozinho! Outras vilas também dependem do aquífero compartilhado.</p>
+          
+          <div class="concept-card">
+            <h4>Estratégias Possíveis:</h4>
+            <p><strong>Cooperação:</strong> Coordenar extrações para preservar o aquífero. 
+            Todos ganham a longo prazo.</p>
+            <p><strong>Competição:</strong> Extrair mais que os outros para maximizar ganhos 
+            imediatos. Risco de colapso.</p>
+          </div>
+          
+          <div class="info-box">
+            <h3>💬 Comunicação</h3>
+            <p>Use os eventos e a gestão territorial para comparar decisões de
+            outras comunidades e organizar a discussão em sala.</p>
+          </div>
+        `
+      },
+      {
+        title: "🎓 Conceitos Científicos",
+        image: "📚",
+        content: `
+          <p>Este jogo usa relações científicas simplificadas para investigação didática:</p>
+          
+          <div class="info-box">
+            <h3>📖 Conceitos Abordados:</h3>
+            <ul>
+              <li><strong>Balanço Hídrico:</strong> Recarga - Extração = Variação do Nível</li>
+              <li><strong>Sazonalidade:</strong> Comparação entre períodos secos e úmidos</li>
+              <li><strong>Dilema dos Comuns:</strong> Recursos compartilhados e ação coletiva</li>
+              <li><strong>Sustentabilidade:</strong> Equilíbrio entre economia e ambiente</li>
+              <li><strong>Gestão de Recursos:</strong> Tomada de decisão com incertezas</li>
+            </ul>
+          </div>
+          
+          <p style="margin-top: 1.5rem; text-align: center; font-weight: 600; color: #2e7d32;">
+            Pronto para começar sua jornada? 🚀
+          </p>
+        `
+      }
+    ];
+    
+    let currentStep = 0;
+    
+    function renderStep() {
+      const step = tutorialSteps[currentStep];
+      const container = document.getElementById('tutorial-steps');
+      
+      container.innerHTML = `
+        <h2 class="step-title">${step.title}</h2>
+        <div class="step-image">${step.image}</div>
+        <div class="step-content">${step.content}</div>
+      `;
+      
+      // Update progress
+      const progress = ((currentStep + 1) / tutorialSteps.length) * 100;
+      document.getElementById('progress-fill').style.width = progress + '%';
+      document.getElementById('step-indicator').textContent = 
+        `Passo ${currentStep + 1} de ${tutorialSteps.length}`;
+      
+      // Update buttons
+      document.getElementById('btn-prev').disabled = currentStep === 0;
+      
+      const btnNext = document.getElementById('btn-next');
+      if (currentStep === tutorialSteps.length - 1) {
+        btnNext.textContent = '✓ Concluir Tutorial';
+        btnNext.className = 'btn btn-finish';
+      } else {
+        btnNext.textContent = 'Próximo →';
+        btnNext.className = 'btn btn-next';
+      }
+    }
+    
+    function nextStep() {
+      if (currentStep < tutorialSteps.length - 1) {
+        currentStep++;
+        renderStep();
+      } else {
+        window.top.location.href = <?!= JSON.stringify(appUrl + '?page=dashboard') ?>;
+      }
+    }
+    
+    function prevStep() {
+      if (currentStep > 0) {
+        currentStep--;
+        renderStep();
+      }
+    }
+    
+    // Initialize
+    renderStep();
+  </script>
+</body>
+</html>

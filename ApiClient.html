@@ -1,0 +1,180 @@
+<script>
+/**
+ * @file ApiClient.html
+ * @description Contrato client-side entre as telas e as funções públicas do Apps Script.
+ * @version 2.0.0
+ *
+ * Este arquivo é incluído pelo template HTML e nunca é executado pelo runtime .gs.
+ * O cliente só usa funções realmente expostas pelo backend do Lago Paranoá.
+ */
+(function (root) {
+  'use strict';
+
+  if (root.LagoAPI) {
+    root.API = root.LagoAPI;
+    return;
+  }
+
+  const config = {
+    timeout: 30000,
+    retryAttempts: 2,
+    retryDelay: 500
+  };
+
+  function getRunner() {
+    if (typeof google === 'undefined' || !google.script || !google.script.run) {
+      throw new Error('A comunicação com o Apps Script não está disponível.');
+    }
+    return google.script.run;
+  }
+
+  function normalizeError(error) {
+    if (error instanceof Error) return error;
+    return new Error(error && error.message ? error.message : 'Erro ao comunicar com o servidor.');
+  }
+
+  function call(functionName, ...args) {
+    return new Promise((resolve, reject) => {
+      let timeoutId;
+      try {
+        const runner = getRunner();
+        timeoutId = setTimeout(() => reject(new Error('Tempo limite excedido.')), config.timeout);
+        runner
+          .withSuccessHandler(response => {
+            clearTimeout(timeoutId);
+            if (response === null || response === undefined) {
+              reject(new Error('O servidor retornou uma resposta vazia para ' + functionName + '.'));
+              return;
+            }
+            resolve(response);
+          })
+          .withFailureHandler(error => {
+            clearTimeout(timeoutId);
+            reject(normalizeError(error));
+          })[functionName](...args);
+      } catch (error) {
+        if (timeoutId) clearTimeout(timeoutId);
+        reject(normalizeError(error));
+      }
+    });
+  }
+
+  async function read(functionName, ...args) {
+    let lastError;
+    for (let attempt = 0; attempt < config.retryAttempts; attempt += 1) {
+      try {
+        return await call(functionName, ...args);
+      } catch (error) {
+        lastError = error;
+        if (attempt < config.retryAttempts - 1) {
+          await new Promise(resolve => setTimeout(resolve, config.retryDelay * (attempt + 1)));
+        }
+      }
+    }
+    throw lastError;
+  }
+
+  function resultData(response) {
+    if (!response || response.success === false) {
+      throw new Error((response && (response.error || response.message)) || 'Operação não concluída.');
+    }
+    return response.data === undefined ? response : response.data;
+  }
+
+  const api = {
+    call,
+
+    auth: {
+      login: (username, password, missionChoice) => call('handleLogin', { username, password, missionChoice }),
+      register: userData => call('handleRegister', userData),
+      logout: () => call('logoutSession'),
+      getCurrentUser: () => read('getCurrentUser'),
+      checkSession: () => read('checkSession')
+    },
+
+    player: {
+      getCurrent: () => read('getCurrentUserPlayer'),
+      getDashboard: playerId => read('getDashboardData', playerId)
+    },
+
+    dashboard: {
+      getData: playerId => playerId
+        ? read('getDashboardData', playerId)
+        : read('getCurrentUserPlayer').then(result => {
+          if (!result || result.success === false) return result;
+          return read('getDashboardData', result.data.playerId);
+        })
+    },
+
+    crops: {
+      getAll: () => read('getAvailableCrops'),
+      plant: (playerId, cropId, quantity = 1) => call('plantCrop', playerId, cropId, quantity),
+      harvest: plantingId => call('harvestCrop', plantingId)
+    },
+
+    round: {
+      getStatus: playerId => read('getInvestigationStatus', playerId),
+      run: (playerId, decision) => call('runInvestigationRound', playerId, decision),
+      review: (playerId, historyId, reflection, nextTest) =>
+        call('completeInvestigationRound', playerId, historyId, reflection, nextTest)
+    },
+
+    market: {
+      buyWater: (playerId, amount) => call('buyWater', playerId, amount),
+      sellCrop: (playerId, cropId, quantity) => call('sellCrop', playerId, cropId, quantity)
+    },
+
+    water: {
+      getOverview: () => read('getWaterManagementData'),
+      purchase: amount => call('buyWaterForCurrentPlayer', amount)
+    },
+
+    climate: {
+      getReport: () => read('getClimateReportData')
+    },
+
+    operations: {
+      getData: moduleName => read('getOperationsHubData', moduleName),
+      savePreference: (key, value) => call('saveOperationalPreference', key, value),
+      savePreferences: preferences => call('saveOperationalPreferences', preferences)
+    },
+
+    admin: {
+      getDashboard: () => read('getAdminDashboardData')
+    },
+
+    village: {
+      join: (playerId, villageId) => call('joinVillage', playerId, villageId),
+      getManagementData: () => read('getVillageManagementData'),
+      recordDecision: (playerId, villageId, decision) =>
+        call('recordVillageDecision', playerId, villageId, decision),
+      recordShorelineInspection: (playerId, villageId, observation) =>
+        call('recordShorelineInspection', playerId, villageId, observation)
+    },
+
+    leaderboards: {
+      list: () => read('getLeaderboards')
+    },
+
+    history: {
+      events: (limit = 50) => read('getGameEvents', limit),
+      rounds: (limit = 100) => read('getGameHistory', limit)
+    },
+
+    notifications: {
+      list: (limit = 30) => read('getCurrentPlayerNotifications', limit),
+      markRead: notificationId => call('markCurrentPlayerNotificationRead', notificationId),
+      markAllRead: () => call('markAllCurrentPlayerNotificationsRead')
+    },
+
+    utils: {
+      ping: () => read('ping')
+    },
+
+    unwrap: resultData
+  };
+
+  root.LagoAPI = api;
+  root.API = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this);
+</script>

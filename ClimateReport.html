@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Leitura climática investigativa da Bacia do Paranoá">
+  <title>Clima e água · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#647c76; --line:#d7e7e2; --canvas:#f3f8f6; --surface:#fff; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c98c2f; --sun:#f2b94b; --danger:#b84a3e; --shadow:0 18px 48px rgba(18,67,59,.1); }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:radial-gradient(circle at 88% -4%,#f9eac6 0,transparent 25rem),radial-gradient(circle at 75% 8%,#d9eee8 0,transparent 34rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+    button { font:inherit; cursor:pointer; } a { color:inherit; }
+    .shell { min-height:100vh; display:grid; grid-template-columns:238px minmax(0,1fr); }
+    .sidebar { position:sticky; top:0; height:100vh; padding:25px 17px; color:#e8f7f2; background:linear-gradient(180deg,#0a5049,#153b38); }
+    .brand { display:flex; align-items:center; gap:11px; padding:0 9px 29px; }
+    .brand-mark { width:40px; height:40px; display:grid; place-items:center; border-radius:13px; color:#795713; background:#fff0c8; font-size:21px; }
+    .brand strong,.brand span { display:block; } .brand strong { font-size:14px; } .brand span { margin-top:3px; color:#a9d0c6; font-size:11px; }
+    .nav-label { padding:0 10px 9px; color:#90beb4; text-transform:uppercase; letter-spacing:.13em; font-size:10px; font-weight:800; }
+    nav { display:grid; gap:5px; }
+    .nav-link { display:flex; gap:10px; align-items:center; padding:11px 12px; border-radius:11px; color:#c4dfd8; text-decoration:none; font-size:13px; font-weight:700; }
+    .nav-link:hover,.nav-link.active { color:#fff; background:rgba(255,255,255,.12); }
+    .sidebar-note { margin-top:36px; padding:15px; border:1px solid rgba(255,255,255,.12); border-radius:14px; background:rgba(255,255,255,.06); }
+    .sidebar-note strong { font-size:12px; } .sidebar-note p { margin:6px 0 0; color:#b8d7cf; font-size:11px; line-height:1.55; }
+    .page { min-width:0; padding:25px clamp(18px,4vw,52px) 48px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; max-width:1240px; margin:0 auto 28px; }
+    .breadcrumb { color:var(--muted); font-size:12px; } .breadcrumb strong { color:var(--ink); }
+    .btn { border:0; border-radius:11px; padding:11px 15px; font-weight:800; transition:.15s ease; } .btn:hover { transform:translateY(-1px); }
+    .btn-primary { color:#fff; background:var(--teal); text-decoration:none; } .btn-light { border:1px solid var(--line); color:var(--ink); background:rgba(255,255,255,.8); }
+    .content { max-width:1240px; margin:0 auto; }
+    .hero { display:grid; grid-template-columns:minmax(0,1fr) 325px; gap:18px; margin-bottom:20px; }
+    .hero-copy { position:relative; overflow:hidden; padding:clamp(25px,4vw,43px); border-radius:23px; color:#effaf6; background:linear-gradient(120deg,#0a5c53,#138678); box-shadow:var(--shadow); }
+    .hero-copy::after { content:"☼"; position:absolute; right:33px; bottom:-38px; color:rgba(255,240,196,.16); font-size:190px; line-height:1; }
+    .eyebrow { position:relative; z-index:1; margin:0 0 10px; color:#ffe4a1; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; }
+    h1 { position:relative; z-index:1; max-width:720px; margin:0 0 12px; font-size:clamp(32px,4.8vw,54px); line-height:1.02; letter-spacing:-.045em; }
+    .hero-copy>p:last-child { position:relative; z-index:1; max-width:690px; margin:0; color:#d9f0e9; font-size:14px; line-height:1.7; }
+    .current-card { display:flex; flex-direction:column; justify-content:space-between; padding:24px; border:1px solid var(--line); border-radius:23px; background:var(--surface); box-shadow:var(--shadow); }
+    .current-label { color:var(--muted); text-transform:uppercase; letter-spacing:.12em; font-size:10px; font-weight:850; }
+    .temperature { margin:9px 0 1px; font-size:43px; font-weight:900; letter-spacing:-.055em; }
+    .season { color:var(--deep); font-size:13px; font-weight:850; }
+    .pill { display:inline-flex; margin-top:10px; padding:6px 10px; border-radius:99px; color:#28745c; background:#e4f4ea; font-size:10px; font-weight:900; }
+    .pill.dry { color:#94522e; background:#fbe7d9; }
+    .sync { display:block; padding-top:17px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+    .metric { padding:17px; border:1px solid var(--line); border-radius:15px; background:rgba(255,255,255,.84); }
+    .metric span { display:block; color:var(--muted); font-size:11px; font-weight:750; } .metric strong { display:block; margin:8px 0 3px; font-size:25px; letter-spacing:-.035em; } .metric small { color:#789089; font-size:10px; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr); gap:18px; align-items:start; }
+    .panel { padding:23px; border:1px solid var(--line); border-radius:19px; background:var(--surface); box-shadow:0 8px 28px rgba(18,67,59,.055); }
+    .panel-header { display:flex; justify-content:space-between; align-items:start; gap:14px; margin-bottom:18px; } .panel h2 { margin:0 0 5px; font-size:20px; letter-spacing:-.025em; } .panel p { margin:0; color:var(--muted); font-size:12px; line-height:1.6; }
+    .chart { min-height:245px; display:flex; align-items:flex-end; gap:8px; padding:23px 8px 8px; border-left:1px solid #dce9e5; border-bottom:1px solid #dce9e5; }
+    .bar-group { min-width:28px; flex:1; height:205px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; gap:6px; }
+    .bar { width:min(34px,80%); min-height:3px; border-radius:6px 6px 2px 2px; background:linear-gradient(180deg,#66b9d3,#177c9c); } .bar-group span,.bar-group strong { font-size:9px; } .bar-group span { color:var(--muted); }
+    .forecast-list { display:grid; gap:9px; list-style:none; padding:0; margin:0; }
+    .forecast-item { display:grid; grid-template-columns:43px minmax(0,1fr) auto; gap:11px; align-items:center; padding:11px; border-radius:12px; background:#f4f8f7; }
+    .month { display:grid; place-items:center; width:43px; height:43px; border-radius:11px; color:#805e1a; background:#fff0c7; font-size:11px; font-weight:900; }
+    .forecast-item strong,.forecast-item small { display:block; } .forecast-item strong { font-size:12px; } .forecast-item small { margin-top:3px; color:var(--muted); font-size:10px; }
+    .forecast-status { padding:5px 7px; border-radius:99px; color:#28745c; background:var(--mint); font-size:9px; font-weight:900; }
+    .forecast-status.dry { color:#94522e; background:#fbe7d9; }
+    .notice { margin-top:13px; padding:12px; border-left:4px solid var(--gold); border-radius:0 10px 10px 0; color:#745a2a; background:#fff8e8; font-size:10px; line-height:1.55; }
+    .interpretation { grid-column:1/-1; display:grid; grid-template-columns:1fr 1fr auto; gap:12px; align-items:center; }
+    .insight { padding:14px; border-radius:13px; background:#f3f8f6; } .insight strong { display:block; margin-bottom:5px; font-size:12px; } .insight p { font-size:11px; }
+    .question { padding:14px; border-radius:13px; background:#fff8e8; } .question strong { display:block; margin-bottom:5px; font-size:12px; } .question p { color:#745a2a; font-size:11px; }
+    .actions { display:flex; gap:8px; flex-direction:column; }
+    .history { grid-column:1/-1; } .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; font-size:12px; } th { padding:10px 8px; color:var(--muted); text-align:left; text-transform:uppercase; letter-spacing:.08em; font-size:9px; } td { padding:12px 8px; border-top:1px solid #e8f0ed; } td strong { color:var(--deep); }
+    .empty { width:100%; padding:27px; border:1px dashed #bad2cb; border-radius:13px; color:var(--muted); text-align:center; font-size:12px; }
+    .message { min-height:19px; margin-top:12px; color:var(--deep); font-size:12px; font-weight:700; } .message.error { color:var(--danger); } .loading { opacity:.58; pointer-events:none; }
+    @media(max-width:980px){ .shell{grid-template-columns:1fr}.sidebar{position:static;width:100%;height:auto}nav{grid-template-columns:repeat(4,minmax(0,1fr))}.sidebar-note,.nav-label{display:none}.brand{padding-bottom:18px}.grid{grid-template-columns:1fr}.interpretation,.history{grid-column:auto}.interpretation{grid-template-columns:1fr}.actions{flex-direction:row} }
+    @media(max-width:700px){ .page{padding:16px 13px 34px}.topbar{align-items:stretch;flex-direction:column}.hero{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}nav{grid-template-columns:1fr 1fr}.nav-link{font-size:11px}.panel{padding:18px}.chart{gap:3px}.bar-group strong{display:none} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" id="climateApp">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <div class="brand"><div class="brand-mark">☼</div><div><strong>Paranoá vivo</strong><span>clima e água</span></div></div><div class="nav-label">Navegação</div>
+      <nav><a class="nav-link" href="?page=dashboard">⌂ Visão geral</a><a class="nav-link" href="?page=aquifer">≈ Observatório</a><a class="nav-link" href="?page=water">◌ Planejar água</a><a class="nav-link active" href="?page=climate" aria-current="page">☼ Clima</a></nav>
+      <div class="sidebar-note"><strong>Medição não é previsão</strong><p>O histórico registra o que ocorreu. A projeção sazonal é uma hipótese do modelo para apoiar decisões no jogo.</p></div>
+    </aside>
+    <main class="page">
+      <div class="topbar"><div class="breadcrumb">Bacia do Paranoá / <strong>Clima e água</strong></div><button class="btn btn-light" type="button" data-action="refresh">↻ Atualizar leitura</button></div>
+      <div class="content">
+        <section class="hero" aria-labelledby="pageTitle"><div class="hero-copy"><p class="eyebrow">Série observada + cenário do modelo</p><h1 id="pageTitle">Leia o clima antes de mover a água.</h1><p>Compare chuva, temperatura e sequência de dias secos com a resposta do aquífero. A projeção ajuda a planejar; o histórico ajuda a explicar.</p></div><aside class="current-card" aria-live="polite"><div><div class="current-label">Condição atual</div><div class="temperature" id="temperature">—</div><div class="season" id="season">Carregando</div><span class="pill" id="climateStatus">SEM DADOS</span></div><small class="sync" id="syncStatus">Conectando à planilha…</small></aside></section>
+        <section class="metrics" aria-label="Indicadores climáticos atuais"><article class="metric"><span>Chuva</span><strong id="rainfall">—</strong><small>mm observados</small></article><article class="metric"><span>Dias secos</span><strong id="drySpell">—</strong><small>sequência registrada</small></article><article class="metric"><span>Probabilidade</span><strong id="probability">—</strong><small>cenário do modelo</small></article><article class="metric"><span>Aquífero</span><strong id="aquiferLevel">—</strong><small id="aquiferStatus">situação compartilhada</small></article></section>
+        <div class="grid">
+          <section class="panel" aria-labelledby="historyChartTitle"><div class="panel-header"><div><h2 id="historyChartTitle">Chuva por rodada</h2><p>Medições persistidas, da mais antiga para a mais recente.</p></div></div><div class="chart" id="rainChart" role="img" aria-label="Histórico de chuva por rodada"><div class="empty">Carregando série climática…</div></div></section>
+          <section class="panel" aria-labelledby="forecastTitle"><div class="panel-header"><div><h2 id="forecastTitle">Próximos cenários</h2><p>Estimativa sazonal calculada pelo modelo local.</p></div></div><ul class="forecast-list" id="forecastList"><li class="empty">Preparando projeções…</li></ul><div class="notice" id="modelNotice">Estimativa do jogo; não substitui previsão meteorológica oficial.</div></section>
+          <section class="panel interpretation" aria-labelledby="interpretationTitle"><div class="insight"><strong id="interpretationTitle">Leitura integrada</strong><p id="interpretationText">Aguardando clima e aquífero para produzir uma leitura comparável.</p></div><div class="question"><strong>Pergunta investigativa</strong><p id="investigationQuestion">A mudança da chuva aparece no aquífero na mesma rodada ou com atraso?</p></div><div class="actions"><a class="btn btn-primary" href="?page=aquifer">Comparar aquífero</a><a class="btn btn-light" href="?page=water">Planejar água</a></div></section>
+          <section class="panel history" aria-labelledby="historyTitle"><div class="panel-header"><div><h2 id="historyTitle">Caderno climático</h2><p>Registros observados; projeções não entram nesta tabela.</p></div></div><div class="table-wrap"><table><thead><tr><th>Rodada</th><th>Estação</th><th>Chuva</th><th>Temperatura</th><th>Dias secos</th><th>Situação</th></tr></thead><tbody id="historyRows"><tr><td colspan="6"><div class="empty">Carregando registros…</div></td></tr></tbody></table></div><div class="message" id="pageMessage" role="status" aria-live="polite"></div></section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      const state={current:null,history:[],forecast:[],aquifer:null,modelNotice:''};
+      const MONTHS=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      function byId(id){return document.getElementById(id)}
+      function number(value){const parsed=Number(value);return Number.isFinite(parsed)?parsed:0}
+      function format(value,digits){return number(value).toLocaleString('pt-BR',{maximumFractionDigits:digits==null?0:digits})}
+      function escapeHtml(value){return String(value==null?'':value).replace(/[&<>'"]/g,function(char){return({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[char]})}
+      function isDry(status){return String(status||'').toUpperCase()==='SECA'}
+      function setMessage(message,error){const target=byId('pageMessage');target.textContent=message||'';target.className='message'+(error?' error':'')}
+      function renderChart(){
+        const rows=state.history.slice(0,12).reverse();if(!rows.length){byId('rainChart').innerHTML='<div class="empty">Ainda não há chuva registrada para comparar.</div>';return}
+        const values=rows.map(function(item){return number(item.rainValue)});const max=Math.max.apply(null,values.concat([1]));
+        byId('rainChart').innerHTML=rows.map(function(item,index){const height=8+(values[index]/max)*178;return '<div class="bar-group"><strong>'+format(values[index])+'</strong><div class="bar" style="height:'+Math.round(height)+'px"></div><span>R'+escapeHtml(item.round==null?'—':item.round)+'</span></div>'}).join('');
+        byId('rainChart').setAttribute('aria-label','Chuva entre 0 e '+format(max)+' milímetros nas últimas '+rows.length+' medições')
+      }
+      function renderForecast(){
+        if(!state.forecast.length){byId('forecastList').innerHTML='<li class="empty">Nenhuma projeção disponível.</li>';return}
+        byId('forecastList').innerHTML=state.forecast.map(function(item){const month=MONTHS[Math.max(0,number(item.month)-1)]||'mês';return '<li class="forecast-item"><span class="month">'+escapeHtml(month)+'</span><div><strong>'+format(item.expectedRainfall)+' mm de chuva</strong><small>Evaporação estimada: '+format(item.expectedEvaporation)+'</small></div><span class="forecast-status '+(isDry(item.status)?'dry':'')+'">'+escapeHtml(item.status||'—')+'</span></li>'}).join('')
+      }
+      function renderHistory(){
+        if(!state.history.length){byId('historyRows').innerHTML='<tr><td colspan="6"><div class="empty">Ainda não há registros climáticos.</div></td></tr>';return}
+        byId('historyRows').innerHTML=state.history.slice(0,12).map(function(item){return '<tr><td>'+escapeHtml(item.round==null?'—':item.round)+'</td><td>'+escapeHtml(item.season||'—')+'</td><td><strong>'+format(item.rainValue)+' mm</strong></td><td>'+format(item.temperature,1)+' °C</td><td>'+format(item.drySpellLength)+'</td><td>'+escapeHtml(item.status||'—')+'</td></tr>'}).join('')
+      }
+      function renderInterpretation(){
+        const climate=state.current||{};const aquifer=state.aquifer||{};const dry=isDry(climate.status);const lowWater=String(aquifer.status||'').toUpperCase()!=='ESTÁVEL';
+        byId('interpretationText').textContent=dry?(lowWater?'Chuva baixa e aquífero sob atenção coincidem. Reduza a demanda e investigue se a tendência persiste.':'A chuva está baixa, mas o aquífero ainda aparece estável. Observe possíveis efeitos com atraso nas próximas rodadas.'):(lowWater?'A chuva não indica seca, mas o aquífero exige atenção. Compare extração e evaporação antes de atribuir a causa ao clima.':'Chuva e aquífero estão em condição estável. O desafio é manter o equilíbrio sem elevar a extração.');
+        byId('investigationQuestion').textContent=dry?'Quantas rodadas de chuva baixa são necessárias para alterar o nível do aquífero?':'Se a próxima rodada tiver menos chuva, qual decisão reduziria melhor a pressão sobre o aquífero?'
+      }
+      function render(){
+        const current=state.current||{};const aquifer=state.aquifer||{};const status=String(current.status||'SEM DADOS').toUpperCase();
+        byId('temperature').textContent=current.temperature==null?'—':format(current.temperature,1)+' °C';byId('season').textContent=current.season||'Estação não informada';byId('climateStatus').textContent=status;byId('climateStatus').className='pill '+(isDry(status)?'dry':'');
+        byId('rainfall').textContent=current.rainValue==null?'—':format(current.rainValue)+' mm';byId('drySpell').textContent=format(current.drySpellLength);byId('probability').textContent=format(number(current.probability)*100)+'%';byId('aquiferLevel').textContent=aquifer.depth==null?'—':format(aquifer.depth)+' m³';byId('aquiferStatus').textContent=aquifer.status||'situação desconhecida';byId('modelNotice').textContent=state.modelNotice||'Estimativa do jogo; não substitui previsão meteorológica oficial.';
+        renderChart();renderForecast();renderHistory();renderInterpretation()
+      }
+      async function loadData(announce){
+        byId('climateApp').classList.add('loading');byId('syncStatus').textContent='Atualizando clima…';setMessage('',false);
+        try{const result=await API.climate.getReport();const data=API.unwrap(result);state.current=data.current||{};state.history=Array.isArray(data.history)?data.history:[];state.forecast=Array.isArray(data.forecast)?data.forecast:[];state.aquifer=data.aquifer||{};state.modelNotice=data.modelNotice||'';render();byId('syncStatus').textContent='Dados sincronizados agora';if(announce)setMessage('Leitura climática atualizada.',false)}
+        catch(error){byId('syncStatus').textContent='Dados indisponíveis';setMessage(error.message||'Não foi possível carregar o clima.',true)}finally{byId('climateApp').classList.remove('loading')}
+      }
+      document.addEventListener('DOMContentLoaded',function(){document.querySelector('[data-action="refresh"]').addEventListener('click',function(){loadData(true)});loadData(false)})
+    })();
+  </script>
+</body>
+</html>

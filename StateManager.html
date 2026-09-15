@@ -1,0 +1,203 @@
+<script>
+/**
+ * @file StateManager.html
+ * @description Client-side state management
+ * @version 1.0.0
+ */
+
+const StateManager = (function() {
+  'use strict';
+  
+  // Private state
+  let state = {
+    user: null,
+    player: null,
+    village: null,
+    aquifer: null,
+    climate: null,
+    market: null,
+    notifications: [],
+    ui: {
+      loading: false,
+      currentPage: 'dashboard',
+      sidebarOpen: true,
+      modalOpen: false
+    }
+  };
+  
+  // Subscribers for state changes
+  const subscribers = {};
+  
+  /**
+   * Subscribe to state changes
+   */
+  function subscribe(key, callback) {
+    if (!subscribers[key]) {
+      subscribers[key] = [];
+    }
+    subscribers[key].push(callback);
+    
+    // Return unsubscribe function
+    return function unsubscribe() {
+      const index = subscribers[key].indexOf(callback);
+      if (index > -1) {
+        subscribers[key].splice(index, 1);
+      }
+    };
+  }
+  
+  /**
+   * Notify subscribers of state change
+   */
+  function notify(key, value) {
+    if (subscribers[key]) {
+      subscribers[key].forEach(callback => callback(value));
+    }
+    
+    // Notify wildcard subscribers
+    if (subscribers['*']) {
+      subscribers['*'].forEach(callback => callback(key, value));
+    }
+  }
+  
+  /**
+   * Get state value
+   */
+  function get(key) {
+    if (!key) return state;
+    
+    const keys = key.split('.');
+    let value = state;
+    
+    for (const k of keys) {
+      if (value === null || value === undefined) return null;
+      value = value[k];
+    }
+    
+    return value;
+  }
+  
+  /**
+   * Set state value
+   */
+  function set(key, value) {
+    const keys = key.split('.');
+    const lastKey = keys.pop();
+    let target = state;
+    
+    // Navigate to parent object
+    for (const k of keys) {
+      if (!target[k]) target[k] = {};
+      target = target[k];
+    }
+    
+    // Set value
+    const oldValue = target[lastKey];
+    target[lastKey] = value;
+    
+    // Notify subscribers
+    if (oldValue !== value) {
+      notify(key, value);
+    }
+  }
+  
+  /**
+   * Update state (merge objects)
+   */
+  function update(key, updates) {
+    const current = get(key);
+    
+    if (typeof current === 'object' && current !== null) {
+      set(key, { ...current, ...updates });
+    } else {
+      set(key, updates);
+    }
+  }
+  
+  /**
+   * Reset state to initial
+   */
+  function reset() {
+    state = {
+      user: null,
+      player: null,
+      village: null,
+      aquifer: null,
+      climate: null,
+      market: null,
+      notifications: [],
+      ui: {
+        loading: false,
+        currentPage: 'dashboard',
+        sidebarOpen: true,
+        modalOpen: false
+      }
+    };
+    
+    notify('*', state);
+  }
+  
+  /**
+   * Save state to localStorage
+   */
+  function persist() {
+    try {
+      localStorage.setItem('lagoParanoa_state', JSON.stringify(state));
+    } catch (error) {
+      console.error('Failed to persist state:', error);
+    }
+  }
+  
+  /**
+   * Load state from localStorage
+   */
+  function restore() {
+    try {
+      const saved = localStorage.getItem('lagoParanoa_state');
+      if (saved) {
+        state = JSON.parse(saved);
+        notify('*', state);
+      }
+    } catch (error) {
+      console.error('Failed to restore state:', error);
+    }
+  }
+  
+  // Public API
+  return {
+    get,
+    set,
+    update,
+    subscribe,
+    reset,
+    persist,
+    restore,
+    
+    // Convenience getters
+    getUser: () => get('user'),
+    getPlayer: () => get('player'),
+    getVillage: () => get('village'),
+    getAquifer: () => get('aquifer'),
+    getClimate: () => get('climate'),
+    getMarket: () => get('market'),
+    getNotifications: () => get('notifications'),
+    getUI: () => get('ui'),
+    
+    // Convenience setters
+    setUser: (user) => set('user', user),
+    setPlayer: (player) => set('player', player),
+    setVillage: (village) => set('village', village),
+    setAquifer: (aquifer) => set('aquifer', aquifer),
+    setClimate: (climate) => set('climate', climate),
+    setMarket: (market) => set('market', market),
+    setNotifications: (notifications) => set('notifications', notifications),
+    
+    // UI state helpers
+    setLoading: (loading) => set('ui.loading', loading),
+    setCurrentPage: (page) => set('ui.currentPage', page),
+    toggleSidebar: () => set('ui.sidebarOpen', !get('ui.sidebarOpen')),
+    openModal: () => set('ui.modalOpen', true),
+    closeModal: () => set('ui.modalOpen', false)
+  };
+})();
+</script>

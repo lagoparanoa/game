@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mapa interativo dos territórios da Bacia do Paranoá">
+  <title>Mapa da bacia · Lago Paranoá</title>
+  <style>
+    :root { --ink:#173b36; --muted:#647b76; --line:#d7e7e2; --canvas:#f3f8f6; --surface:#fff; --teal:#0b7469; --deep:#07534c; --mint:#dff3ec; --gold:#c98c2f; --danger:#b84a3e; --shadow:0 18px 48px rgba(18,67,59,.1); }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:radial-gradient(circle at 88% -5%,#d9eee8 0,transparent 31rem),var(--canvas); font-family:Inter,ui-sans-serif,system-ui,sans-serif; } button { font:inherit; cursor:pointer; } a { color:inherit; }
+    .page { min-height:100vh; padding:25px clamp(16px,4vw,52px) 48px; } .topbar { display:flex; justify-content:space-between; align-items:center; gap:15px; max-width:1240px; margin:0 auto 27px; } .brand { display:flex; align-items:center; gap:10px; font-weight:850; } .mark { width:40px; height:40px; display:grid; place-items:center; border-radius:13px; color:#fff; background:var(--teal); }
+    .actions { display:flex; gap:8px; }.btn { display:inline-flex; justify-content:center; align-items:center; border:0; border-radius:11px; padding:11px 15px; font-weight:800; text-decoration:none; }.btn-primary { color:#fff; background:var(--teal); }.btn-light { border:1px solid var(--line); background:rgba(255,255,255,.82); }
+    .content { max-width:1240px; margin:0 auto; }.hero { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; margin-bottom:20px; }.hero-copy { padding:clamp(27px,4vw,45px); border-radius:23px; color:#effaf6; background:linear-gradient(120deg,#0a5c53,#138678); box-shadow:var(--shadow); }.eyebrow { margin:0 0 10px; color:#afe0d3; text-transform:uppercase; letter-spacing:.15em; font-size:10px; font-weight:850; }h1 { margin:0 0 12px; font-size:clamp(32px,4.8vw,54px); line-height:1.02; letter-spacing:-.045em; }.hero-copy p:last-child { margin:0; color:#d9f0e9; font-size:14px; line-height:1.7; }.legend { padding:22px; border:1px solid var(--line); border-radius:23px; background:#fff; box-shadow:var(--shadow); }.legend h2 { margin:0 0 12px; font-size:17px; }.legend ul { display:grid; gap:9px; list-style:none; padding:0; margin:0; }.legend li { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:11px; }.legend i { width:12px; height:12px; border-radius:4px; background:var(--teal); }.legend li:nth-child(2) i { background:var(--gold); }.legend li:nth-child(3) i { background:var(--danger); }
+    .layout { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr); gap:18px; align-items:start; }.panel { padding:22px; border:1px solid var(--line); border-radius:19px; background:#fff; box-shadow:0 8px 28px rgba(18,67,59,.055); }.panel h2 { margin:0 0 5px; font-size:20px; }.panel>p { margin:0 0 17px; color:var(--muted); font-size:12px; line-height:1.6; }.scene-wrap { overflow:hidden; border-radius:15px; background:#e8f3ef; }.scene-wrap .game-scene { margin:0; }.scene-wrap .game-scene__world { max-height:none; min-height:300px; border:0; border-radius:15px; }
+    .territories { display:grid; gap:9px; list-style:none; padding:0; margin:0; }.territory { padding:12px; border-radius:12px; background:#f4f8f7; }.territory-head { display:flex; justify-content:space-between; gap:10px; }.territory strong { font-size:12px; }.territory span { color:var(--deep); font-size:10px; font-weight:850; }.territory p { margin:5px 0 0; color:var(--muted); font-size:10px; line-height:1.5; }.meter { height:6px; margin-top:9px; overflow:hidden; border-radius:99px; background:#e1ece8; }.meter i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--gold),var(--teal)); }
+    .question { margin-top:14px; padding:14px; border-left:4px solid var(--gold); border-radius:0 11px 11px 0; color:#705727; background:#fff8e8; font-size:11px; line-height:1.55; }.message { min-height:19px; margin-top:12px; color:var(--deep); font-size:12px; font-weight:700; }.message.error { color:var(--danger); }.loading { opacity:.58; pointer-events:none; }.empty { padding:25px; border:1px dashed #bad2cb; border-radius:12px; color:var(--muted); text-align:center; font-size:12px; }
+    @media(max-width:850px){ .hero,.layout{grid-template-columns:1fr} } @media(max-width:600px){ .page{padding:15px 12px 32px}.topbar{align-items:stretch;flex-direction:column}.actions{flex-wrap:wrap}.panel{padding:16px}.scene-wrap .game-scene__world{min-height:220px} }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <main class="page" id="mapApp">
+    <div class="topbar">
+      <div class="brand">
+        <span class="mark">⌘</span>
+        <span>Mapa da Bacia do Paranoá</span>
+      </div>
+      <div class="actions">
+        <a class="btn btn-light" href="?page=dashboard">← Painel</a>
+        <button class="btn btn-primary" type="button" data-action="refresh">↻ Atualizar territórios</button>
+      </div>
+    </div>
+    <div class="content">
+      <section class="hero" aria-labelledby="pageTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">Exploração e leitura territorial</p>
+          <h1 id="pageTitle">Mova-se pelo mapa. Compare antes de agir.</h1>
+          <p>Explore o cenário com teclado e use os indicadores reais das vilas para escolher onde uma intervenção pode gerar maior impacto.</p>
+        </div>
+        <aside class="legend" aria-label="Legenda do mapa">
+          <h2>Como ler</h2>
+          <ul>
+            <li><i></i>Condição sustentável</li>
+            <li><i></i>Atenção e transição</li>
+            <li><i></i>Risco prioritário</li>
+          </ul>
+        </aside>
+      </section>
+      <div class="layout">
+        <section class="panel" aria-labelledby="sceneTitle">
+          <h2 id="sceneTitle">Cenário explorável</h2>
+          <p>Use setas ou WASD. As imagens vêm do manifesto de assets configurado para o projeto.</p>
+          <div class="scene-wrap"><?!= AssetManager.include('GameScene'); ?></div>
+          <div class="question">Ao se mover pelo mapa, compare: o território mais populoso é também o mais pressionado por água?</div>
+        </section>
+        <aside class="panel" aria-labelledby="territoriesTitle">
+          <h2 id="territoriesTitle">Territórios em foco</h2>
+          <p>Vilas ativas ordenadas pelo índice de sustentabilidade.</p>
+          <ul class="territories" id="territoryList">
+            <li class="empty">Carregando territórios…</li>
+          </ul>
+          <div class="actions">
+            <a class="btn btn-primary" href="?page=village">Abrir gestão territorial</a>
+            <a class="btn btn-light" href="?page=aquifer">Ver aquífero</a>
+          </div>
+          <div class="message" id="pageMessage" role="status" aria-live="polite"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <?!= include('ApiClient'); ?>
+  <script>
+    (function(){
+      'use strict';
+      const app = document.getElementById('mapApp');
+      function byId(id) { return document.getElementById(id); }
+      function number(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>'"]/g, function(char) {
+          return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char];
+        });
+      }
+      function setMessage(message, error) {
+        const target = byId('pageMessage');
+        target.textContent = message || '';
+        target.className = 'message' + (error ? ' error' : '');
+      }
+      function render(villages) {
+        const sorted = (villages || []).slice().sort(function(a, b) {
+          return number(a.sustainabilityIndex) - number(b.sustainabilityIndex);
+        });
+        byId('territoryList').innerHTML = sorted.length ? sorted.map(function(village) {
+          const score = Math.max(0, Math.min(100, number(village.sustainabilityIndex)));
+          return '<li class="territory"><div class="territory-head"><strong>' +
+            escapeHtml(village.name || village.villageId) + '</strong><span>' + score +
+            '/100</span></div><p>Região ' + escapeHtml(village.region || 'não informada') +
+            ' · água ' + escapeHtml(village.waterAllocation || 0) + ' · população ' +
+            escapeHtml(village.population || 0) + '</p><div class="meter"><i style="width:' +
+            score + '%"></i></div></li>';
+        }).join('') : '<li class="empty">Nenhuma vila ativa encontrada.</li>';
+      }
+      async function loadData(announce) {
+        app.classList.add('loading');
+        setMessage('', false);
+        try {
+          const result = await API.operations.getData('map');
+          const data = API.unwrap(result);
+          render(data.villages);
+          if (announce) setMessage('Territórios atualizados.', false);
+        } catch(error) {
+          setMessage(error.message || 'Não foi possível carregar os territórios.', true);
+        } finally {
+          app.classList.remove('loading');
+        }
+      }
+      document.querySelector('[data-action="refresh"]').addEventListener('click', function() {
+        loadData(true);
+      });
+      loadData(false);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Lago Paranoá</title>
+  <style id="lago-login-brand">
+    .login-brand-logo { width: 96px; height: 96px; display: block; margin: 0 auto; object-fit: contain; border-radius: 24px; box-shadow: 0 12px 28px rgba(0,0,0,.24); }
+  </style>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      max-width: 900px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .login-sidebar {
+      background: linear-gradient(135deg, #004d40 0%, #00695c 100%);
+      color: white;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .login-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .login-sidebar h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    .login-sidebar p {
+      text-align: center;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .login-features {
+      margin-top: 2rem;
+      list-style: none;
+    }
+    
+    .login-features li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    
+    .login-features li::before {
+      content: "✓";
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    
+    .login-form-section {
+      padding: 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .prelogin-panel {
+      margin-bottom: 2rem;
+    }
+
+    .prelogin-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .mission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mission-card {
+      background: #f1f8f4;
+      border: 2px solid transparent;
+      border-radius: 18px;
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .mission-card:hover,
+    .mission-card.selected {
+      transform: translateY(-4px);
+      border-color: #004d40;
+      background: #e8f5e9;
+    }
+
+    .mission-card strong {
+      display: block;
+      font-size: 1rem;
+      color: #004d40;
+    }
+
+    .mission-card span {
+      color: #555;
+      line-height: 1.4;
+    }
+
+    .mission-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mission-actions .btn-secondary {
+      background: transparent;
+      color: #004d40;
+      border: 2px solid #004d40;
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .mission-actions .btn-secondary:hover {
+      background: #004d40;
+      color: white;
+    }
+
+    .section-hidden {
+      display: none !important;
+    }
+
+    .mission-note {
+      color: #2e7d32;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-header h1 {
+      font-size: 1.8rem;
+      color: #004d40;
+      margin-bottom: 0.5rem;
+    }
+    
+    .login-header p {
+      color: #666;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #004d40;
+    }
+    
+    .password-toggle {
+      position: relative;
+    }
+    
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: #666;
+    }
+    
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .remember-me input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .forgot-link {
+      color: #004d40;
+      text-decoration: none;
+    }
+    
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    .credential-warning {
+      margin: -0.5rem 0 1.25rem;
+      padding: 0.75rem 0.9rem;
+      border-left: 4px solid #c98c2f;
+      border-radius: 0 8px 8px 0;
+      color: #705727;
+      background: #fff8e8;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    
+    .btn-login {
+      width: 100%;
+      padding: 1rem;
+      background: #004d40;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-login:hover {
+      background: #00695c;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,77,64,0.3);
+    }
+    
+    .btn-login:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 1.5rem 0;
+      color: #999;
+      position: relative;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: #e0e0e0;
+    }
+    
+    .divider::before {
+      left: 0;
+    }
+    
+    .divider::after {
+      right: 0;
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #666;
+    }
+    
+    .register-link a {
+      color: #004d40;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .alert.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .alert-error {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #c62828;
+    }
+    
+    .alert-success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #2e7d32;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .back-home {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    
+    .back-home a {
+      color: #004d40;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    
+    .back-home a:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .login-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .login-sidebar {
+        padding: 2rem 1.5rem;
+      }
+      
+      .login-form-section {
+        padding: 2rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body { padding: 0; }
+      .login-container { border-radius: 0; }
+      .mission-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Sidebar -->
+    <div class="login-sidebar">
+      <div class="login-icon" aria-label="Marca Lago Paranoá">
+        <img class="login-brand-logo" src="data:image/svg+xml;base64,<?!= includeInlineData('BrandLogoBase64') ?>" alt="Marca Lago Paranoá">
+      </div>
+      <h2>Bem-vindo de Volta!</h2>
+      <p>Embarque em sua missão de proteger o lago, cuidar da vila e equilibrar água, alimentos e energia.</p>
+      
+      <ul class="login-features">
+        <li>Acompanhe seu progresso</li>
+        <li>Gerencie sua vila</li>
+        <li>Tome decisões estratégicas</li>
+        <li>Aprenda com dados reais</li>
+      </ul>
+    </div>
+    
+    <!-- Form Section -->
+    <div class="login-form-section">
+      <div class="prelogin-panel">
+        <div class="prelogin-header">
+          <h3>Escolha sua jornada inicial</h3>
+          <p>Um pequeno desafio antes de entrar: defina seu foco para a primeira missão.</p>
+        </div>
+        <div class="mission-grid">
+          <button type="button" class="mission-card selected" data-mission="Gestão da Água" aria-pressed="true">
+            <strong>Gestão da Água</strong>
+            <span>Comece controlando o ciclo do lago e garantindo água para a vila.</span>
+          </button>
+          <button type="button" class="mission-card" data-mission="Cultivo Sustentável" aria-pressed="false">
+            <strong>Cultivo Sustentável</strong>
+            <span>Prepare plantações eficientes e aumente a produção com menos recursos.</span>
+          </button>
+          <button type="button" class="mission-card" data-mission="Proteção da Vila" aria-pressed="false">
+            <strong>Proteção da Vila</strong>
+            <span>Decida como responder a um evento climático e proteger sua comunidade.</span>
+          </button>
+        </div>
+        <div class="mission-actions">
+          <span class="mission-note">Missão selecionada: <strong id="selected-mission">Gestão da Água</strong></span>
+          <button type="button" class="btn-secondary" id="mission-reset">Reiniciar escolha</button>
+        </div>
+      </div>
+      <div class="login-header">
+        <h1>Entrar</h1>
+        <p>Acesse sua conta de gestor</p>
+      </div>
+      
+      <div id="alert-container" role="alert" aria-live="polite" aria-atomic="true"></div>
+      
+      <form id="login-form" autocomplete="on" aria-describedby="alert-container credential-warning" aria-busy="false">
+        <input type="hidden" id="mission-choice" name="missionChoice" value="Gestão da Água">
+        <div class="form-group">
+          <label for="username">Usuário ou e-mail</label>
+          <input inputmode="text" 
+            type="text" 
+            id="username" 
+            name="username" 
+            required 
+            placeholder="seu.usuario ou email@dominio.com"
+            autocomplete="username"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
+            enterkeyhint="next"
+            minlength="3"
+            maxlength="254"
+            autofocus
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <div class="password-toggle">
+            <input inputmode="text" 
+              type="password" 
+              id="password" 
+              name="password" 
+              required 
+              placeholder="Sua senha"
+              autocomplete="current-password"
+              enterkeyhint="go"
+              minlength="4"
+              maxlength="128"
+            >
+            <button type="button" class="password-toggle-btn" aria-controls="password" aria-pressed="false" aria-label="Mostrar senha" onclick="togglePassword()">👁️</button>
+          </div>
+        </div>
+
+        <div class="credential-warning" id="credential-warning">Use somente a senha exclusiva desta atividade. Esta implantação não protege senhas com hash.</div>
+        
+        <div class="remember-forgot">
+          <a href="?page=privacy" class="forgot-link" target="_top">Privacidade</a>
+          <a href="?page=register" class="forgot-link" target="_top">Precisa de um novo acesso?</a>
+        </div>
+        
+        <button type="submit" class="btn-login" id="btn-submit" disabled>
+          Entrar
+        </button>
+      </form>
+      
+      <div class="divider">ou</div>
+      
+      <div class="register-link">
+        Não tem uma conta? <a href="?page=register">Registre-se</a>
+      </div>
+      
+      <div class="back-home">
+        <a href="?">← Voltar para Home</a>
+      </div>
+    </div>
+  </div>
+
+  <?!= include('StateManager'); ?>
+  <?!= include('ApiClient'); ?>
+  <?!= include('UIComponents'); ?>
+
+  <script>
+    // Toggle password visibility
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const toggleBtn = document.querySelector('.password-toggle-btn');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleBtn.textContent = '🙈';
+        toggleBtn.setAttribute('aria-pressed', 'true');
+        toggleBtn.setAttribute('aria-label', 'Ocultar senha');
+      } else {
+        passwordInput.type = 'password';
+        toggleBtn.textContent = '👁️';
+        toggleBtn.setAttribute('aria-pressed', 'false');
+        toggleBtn.setAttribute('aria-label', 'Mostrar senha');
+      }
+    }
+    
+    // Show alert message
+    function showAlert(message, type = 'error') {
+      const alertContainer = document.getElementById('alert-container');
+      const alert = document.createElement('div');
+      const safeType = type === 'success' ? 'success' : 'error';
+      alert.className = 'alert alert-' + safeType + ' show';
+      alert.textContent = String(message || 'Não foi possível concluir a solicitação.');
+      alertContainer.replaceChildren(alert);
+      
+      setTimeout(() => {
+        if (alert.isConnected) alert.classList.remove('show');
+      }, 5000);
+    }
+    
+    function updateSubmitState() {
+      const submitBtn = document.getElementById('btn-submit');
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const valid = username.length >= 3 && password.length >= 4;
+      submitBtn.disabled = !valid;
+      document.getElementById('username').setAttribute('aria-invalid', username.length >= 3 ? 'false' : 'true');
+      document.getElementById('password').setAttribute('aria-invalid', password.length >= 4 ? 'false' : 'true');
+    }
+
+    // Handle form submission
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('btn-submit');
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (username.length < 3) {
+        showAlert('Informe um usuário ou e-mail válido.');
+        return;
+      }
+      if (password.length < 4) {
+        showAlert('A senha precisa ter pelo menos 4 caracteres.');
+        return;
+      }
+      
+      // Disable button
+      submitBtn.disabled = true;
+      document.getElementById('login-form').setAttribute('aria-busy', 'true');
+      submitBtn.textContent = 'Entrando...';
+      
+      // Call backend using the shared client contract
+      const missionChoice = document.getElementById('mission-choice').value;
+      API.auth.login(username, password, missionChoice)
+        .then(function(result) {
+          if (result.success) {
+            const successMessage = result.missionChoice
+              ? 'Login realizado com sucesso! Missão inicial: ' + result.missionChoice
+              : 'Login realizado com sucesso! Redirecionando...';
+            showAlert(successMessage, 'success');
+            setTimeout(() => {
+              window.top.location.href = <?!= JSON.stringify(appUrl + '?page=dashboard') ?>;
+            }, 1000);
+          } else {
+            showAlert(result.message || 'Usuário ou senha incorretos');
+            document.getElementById('password').value = '';
+            submitBtn.disabled = false;
+            document.getElementById('login-form').setAttribute('aria-busy', 'false');
+            submitBtn.textContent = 'Entrar';
+            updateSubmitState();
+          }
+        })
+        .catch(function(error) {
+          showAlert('Erro ao conectar com servidor: ' + error.message);
+          submitBtn.disabled = false;
+          document.getElementById('login-form').setAttribute('aria-busy', 'false');
+          submitBtn.textContent = 'Entrar';
+          updateSubmitState();
+        });
+    });
+
+    document.querySelectorAll('#username, #password').forEach(function (field) {
+      field.addEventListener('input', function () {
+        updateSubmitState();
+      });
+    });
+
+    function setSelectedMission(missionName) {
+      const missionCards = document.querySelectorAll('.mission-card');
+      missionCards.forEach(function(card) {
+        if (card.dataset.mission === missionName) {
+          card.classList.add('selected');
+          card.setAttribute('aria-pressed', 'true');
+        } else {
+          card.classList.remove('selected');
+          card.setAttribute('aria-pressed', 'false');
+        }
+      });
+      document.getElementById('selected-mission').textContent = missionName;
+      document.getElementById('mission-choice').value = missionName;
+    }
+
+    document.querySelectorAll('.mission-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        setSelectedMission(card.dataset.mission);
+      });
+    });
+
+    document.getElementById('mission-reset').addEventListener('click', function() {
+      setSelectedMission('Gestão da Água');
+    });
+    
+    // Auto-focus username field
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('username').focus();
+      
+      // Check for error parameter in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const error = urlParams.get('error');
+      if (error) {
+        showAlert(error);
+      }
+      updateSubmitState();
+    });
+  </script>
+</body>
+</html>

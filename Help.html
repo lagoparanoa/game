@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base href="<?= appUrl ?>" target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajuda - Lago Paranoá</title>
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      padding: 2rem;
+    }
+    
+    .help-container { max-width: 1200px; margin: 0 auto; }
+    
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #6a1b9a;
+    }
+    
+    .page-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    
+    .search-bar {
+      background: white;
+      padding: 1rem;
+      border-radius: 50px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      padding: 0.5rem;
+    }
+    
+    .search-bar button {
+      background: #6a1b9a;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    .search-bar button:hover { background: #8e24aa; }
+    
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .category-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(106,27,154,0.2);
+    }
+    
+    .category-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    
+    .category-title {
+      font-size: 1.3rem;
+      color: #6a1b9a;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .category-description {
+      color: #757575;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .faq-section {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .faq-title {
+      font-size: 1.8rem;
+      color: #6a1b9a;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .faq-item {
+      border-bottom: 1px solid #e0e0e0;
+      padding: 1rem 0;
+    }
+    
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #212121;
+      padding: 0.5rem 0;
+    }
+    
+    .faq-question:hover { color: #6a1b9a; }
+    
+    .faq-toggle {
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      color: #424242;
+      line-height: 1.6;
+    }
+    
+    .faq-answer.open {
+      max-height: 500px;
+      padding: 1rem 0;
+    }
+    
+    .quick-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .quick-link {
+      background: #f3e5f5;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #6a1b9a;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .quick-link:hover {
+      background: #6a1b9a;
+      color: white;
+    }
+    
+    .back-link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    
+    .back-link a {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: #6a1b9a;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+    
+    .back-link a:hover { background: #8e24aa; }
+  </style>
+  <style id="fleet-mobile-wcag-aa">
+    /* Contrato FROTA: ergonomia S20 e WCAG 2.1 AA. */
+    html, body { max-width: 100%; overflow-x: hidden; }
+    :is(button, [role="button"], input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+      min-width: 48px !important;
+      min-height: 48px !important;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+  <div class="help-container">
+    <div class="page-header">
+      <h1>❓ Central de Ajuda</h1>
+      <p>Encontre respostas e aprenda sobre o jogo</p>
+    </div>
+    
+    <div class="search-bar">
+      <span style="font-size: 1.3rem;">🔍</span>
+      <input inputmode="text" type="text" placeholder="Buscar ajuda sobre..." id="search-input">
+      <button onclick="searchHelp()">Buscar</button>
+    </div>
+    
+    <div class="categories-grid">
+      <div class="category-card" onclick="showCategory('basics')">
+        <span class="category-icon">🎮</span>
+        <h3 class="category-title">Primeiros Passos</h3>
+        <p class="category-description">Aprenda o básico do jogo</p>
+      </div>
+      
+      <div class="category-card" onclick="showCategory('water')">
+        <span class="category-icon">💧</span>
+        <h3 class="category-title">Gestão de Água</h3>
+        <p class="category-description">Aquífero, extração e recarga</p>
+      </div>
+      
+      <div class="category-card" onclick="showCategory('agriculture')">
+        <span class="category-icon">🌾</span>
+        <h3 class="category-title">Agricultura</h3>
+        <p class="category-description">Culturas e produtividade</p>
+      </div>
+      
+      <div class="category-card" onclick="showCategory('economy')">
+        <span class="category-icon">💰</span>
+        <h3 class="category-title">Economia</h3>
+        <p class="category-description">Mercado, lucros e custos</p>
+      </div>
+      
+      <div class="category-card" onclick="showCategory('climate')">
+        <span class="category-icon">🌦️</span>
+        <h3 class="category-title">Sistema Climático</h3>
+        <p class="category-description">Como funciona o clima</p>
+      </div>
+      
+      <div class="category-card" onclick="showCategory('villages')">
+        <span class="category-icon">🏘️</span>
+        <h3 class="category-title">Vilas e Comunidades</h3>
+        <p class="category-description">Cooperação e competição</p>
+      </div>
+    </div>
+    
+    <div class="faq-section">
+      <h2 class="faq-title">Perguntas Frequentes</h2>
+      
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Como funciona o aquífero compartilhado?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          O aquífero é um recurso comum compartilhado por todas as vilas. Cada extração reduz 
+          o nível total disponível para todos. A recarga acontece através da precipitação e 
+          infiltração. Se o aquífero secar, todos sofrem as consequências.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Qual cultura plantar para maximizar lucro?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          Não há uma resposta única. Compare na tela de culturas o consumo
+          hídrico, o ciclo e o preço carregados para a atividade. A melhor
+          estratégia considera resultado econômico e conservação de recursos.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Como o clima afeta meu jogo?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          O jogo compara períodos secos e úmidos por um modelo sazonal
+          simplificado. O relatório separa medições persistidas de estimativas;
+          use essa diferença para planejar e revisar sua hipótese.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>O que acontece se minha vila falir?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          Consulte o módulo econômico para observar receitas, despesas e
+          transações persistidas. Uma decisão só é confirmada pelo módulo que
+          valida seus custos e regras atuais.
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Como cooperar com outras vilas?</span>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          Use os eventos e a gestão territorial para comparar escolhas de
+          outras comunidades. A negociação pode ser conduzida pelo professor e
+          registrada como decisão da vila.
+        </div>
+      </div>
+    </div>
+    
+    <div class="quick-links">
+      <a href="?page=tutorial" class="quick-link">📚 Tutorial Interativo</a>
+      <a href="?page=about" class="quick-link">ℹ️ Sobre o Projeto</a>
+      <a href="?page=reports" class="quick-link">📊 Relatórios e Dados</a>
+      <a href="?page=settings" class="quick-link">⚙️ Configurações</a>
+    </div>
+    
+    <div class="back-link">
+      <a href="?page=dashboard">← Voltar ao Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    function toggleFAQ(element) {
+      const answer = element.nextElementSibling;
+      const toggle = element.querySelector('.faq-toggle');
+      
+      answer.classList.toggle('open');
+      toggle.textContent = answer.classList.contains('open') ? '−' : '+';
+    }
+    
+    function showCategory(category) {
+      const faqSection = document.querySelector('.faq-section');
+      if (faqSection) faqSection.scrollIntoView({ behavior: 'smooth' });
+
+      const categoryKeywords = {
+        basics: ['funciona', 'começar', 'jogo', 'vila'],
+        water: ['aquífero', 'água', 'recarga', 'extração', 'poço'],
+        agriculture: ['cultura', 'plantação', 'produtividade', 'safra'],
+        economy: ['dinheiro', 'lucro', 'falir', 'custo', 'mercado', 'preço'],
+        climate: ['clima', 'chuva', 'seca', 'período'],
+        villages: ['vila', 'comunidade', 'cooperar', 'aliança']
+      };
+
+      const keywords = categoryKeywords[category] || [];
+      document.querySelectorAll('.faq-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const matches = keywords.some(kw => text.includes(kw));
+        const answer = item.querySelector('.faq-answer');
+        const toggle = item.querySelector('.faq-toggle');
+        if (matches && answer && toggle) {
+          answer.classList.add('open');
+          toggle.textContent = '−';
+          item.style.display = 'block';
+        }
+      });
+    }
+    
+    function searchHelp() {
+      const query = (document.getElementById('search-input').value || '').trim().toLowerCase();
+      const items = document.querySelectorAll('.faq-item');
+      let foundCount = 0;
+
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const match = !query || text.includes(query);
+        item.style.display = match ? 'block' : 'none';
+        if (match) {
+          foundCount++;
+          if (query) {
+            const answer = item.querySelector('.faq-answer');
+            const toggle = item.querySelector('.faq-toggle');
+            if (answer && toggle) {
+              answer.classList.add('open');
+              toggle.textContent = '−';
+            }
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', searchHelp);
+        searchInput.addEventListener('keyup', function(e) { if (e.key === 'Enter') searchHelp(); });
+      }
+    });
+  </script>
+</body>
+</html>
